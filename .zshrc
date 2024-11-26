@@ -1,72 +1,105 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+if [ -z "$TMUX" ]; then
+    tmux
 fi
 
-# Suppress Powerlevel10k instant prompt warning
-# typeset -g POWERLEVEL9K_INSTANT_PROMPT=off
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+# Oh-my-zsh installation path
+ZSH=/usr/share/oh-my-zsh/
+
+# Powerlevel10k theme path
+source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+
+# List of plugins used
+plugins=(
+  # git
+  sudo
+  zsh-256color
+  zsh-autosuggestions
+  zsh-syntax-highlighting
+  archlinux
+  fzf-tab
+  you-should-use
+  zsh-bat
+  pyenv
+)
+
+source $ZSH/oh-my-zsh.sh
+
+# In case a command is not found, try to find the package that has it
+function command_not_found_handler {
+    local purple='\e[1;35m' bright='\e[0;1m' green='\e[1;32m' reset='\e[0m'
+    printf 'zsh: command not found: %s\n' "$1"
+    local entries=( ${(f)"$(/usr/bin/pacman -F --machinereadable -- "/usr/bin/$1")"} )
+    if (( ${#entries[@]} )) ; then
+        printf "${bright}$1${reset} may be found in the following packages:\n"
+        local pkg
+        for entry in "${entries[@]}" ; do
+            local fields=( ${(0)entry} )
+            if [[ "$pkg" != "${fields[2]}" ]]; then
+                printf "${purple}%s/${bright}%s ${green}%s${reset}\n" "${fields[1]}" "${fields[2]}" "${fields[3]}"
+            fi
+            printf '    /%s\n' "${fields[4]}"
+            pkg="${fields[2]}"
+        done
+    fi
+    return 127
+}
+
+# Detect AUR wrapper
+if pacman -Qi yay &>/dev/null; then
+   aurhelper="yay"
+elif pacman -Qi paru &>/dev/null; then
+   aurhelper="paru"
+fi
+
+function in {
+    local -a inPkg=("$@")
+    local -a arch=()
+    local -a aur=()
+
+    for pkg in "${inPkg[@]}"; do
+        if pacman -Si "${pkg}" &>/dev/null; then
+            arch+=("${pkg}")
+        else
+            aur+=("${pkg}")
+        fi
+    done
+
+    if [[ ${#arch[@]} -gt 0 ]]; then
+        sudo pacman -S "${arch[@]}"
+    fi
+
+    if [[ ${#aur[@]} -gt 0 ]]; then
+        ${aurhelper} -S "${aur[@]}"
+    fi
+}
+
+
+[[ -f "$HOME/.alias" ]] && source "$HOME/.alias"
+
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-# Installing plugin manager
-ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
-
-if [ ! -d "$ZINIT_HOME" ]; then
-  mkdir -p "$(dirname $ZINIT_HOME)"
-  git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+if [[ -n $SSH_CONNECTION ]]; then
+    export EDITOR='nvim'
+else
+    export EDITOR='vim'
 fi
 
-source "${ZINIT_HOME}/zinit.zsh"
 
-# Add powerlevel10k as plugin
-zinit ice depth=1; zinit light romkatv/powerlevel10k
+# Display Pokemon
+#pokemon-colorscripts --no-title -r 1,3,6
 
-# Loading aliases from .bash_aliases file
-if [ -f "$HOME/.bash_aliases" ]; then
-    . "$HOME/.bash_aliases"
-fi
 
-# Load plugins after instant prompt initialization
-zinit light zsh-users/zsh-syntax-highlighting
-zinit light zsh-users/zsh-completions
-zinit light zsh-users/zsh-autosuggestions
-zinit light Aloxaf/fzf-tab
 
-# Load zsh-completions
-autoload -U compinit && compinit
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
 
-# KEYBINDS
-#bindkey -e
-bindkey '^p' history-search-backward
-bindkey '^n' history-search-forward
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-# HISTORY
-HISTSIZE=5000
-HISTFILE=~/.zsh_history
-SAVEFILE=$HISTSIZE
-HISTDUP=erase
-setopt appendhistory
-setopt sharehistory
-setopt hist_ignore_space
-setopt hist_ignore_all_dups
-setopt hist_save_no_dups
-setopt hist_ignore_dups
-setopt hist_find_no_dups
 
-# COMPLETION STYLING
-zstyle ':completion:*' matcher-list 'm:{a-Z}={A-Za-z}'
-zstyle ':completion:*' list-color "${(s.:.)LS_COLORS}"
-zstyle ':completion:*' menu-no
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
-
-# Additional console I/O commands should go below this line
-alias ls='ls --color'
-
-# FZF initialization
-eval "$(fzf --zsh)"
-
-# Printing NeoFetch
 neofetch

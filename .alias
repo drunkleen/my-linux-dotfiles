@@ -1,0 +1,142 @@
+# Helpful aliases
+alias c='clear' # clear terminal
+alias l='eza -lh --icons=auto' # long list
+alias ld='eza -lhD --icons=auto' # long list dirs
+alias un='$aurhelper -Rns' # uninstall package
+alias up='$aurhelper -Syu' # update system/package/aur
+alias pl='$aurhelper -Qs' # list installed package
+alias pa='$aurhelper -Ss' # list available package
+alias pc='$aurhelper -Sc' # remove unused cache
+alias po='$aurhelper -Qtdq | $aurhelper -Rns -' # remove unused packages, also try > $aurhelper -Qqd | $aurhelper -Rsu --print -
+alias vc='code' # gui code editor
+
+
+alias ls='eza -a --icons'
+alias ll='eza -al --icons'
+alias lt='eza -a --tree --level=1 --icons'
+
+
+### aliases
+# Update package database and upgrade all installed packages
+alias update='sudo pacman -Syu'
+
+# Install one or more packages
+alias install='sudo pacman -S'
+
+# Remove a package
+alias remove='sudo pacman -R'
+
+# Remove a package and its dependencies
+alias remove-deps='sudo pacman -Rns'
+
+# Search for a package in the repositories
+alias search='pacman -Ss'
+
+# List installed packages
+alias list='pacman -Q'
+
+# Show information about a specific package
+alias info='pacman -Qi'
+
+
+### bindings
+alias cat='bat'
+alias vim='nvim'
+alias cls='clear'
+
+# Directory navigation shortcuts
+alias ..='cd ..'
+alias ...='cd ../..'
+alias .3='cd ../../..'
+alias .4='cd ../../../..'
+alias .5='cd ../../../../..'
+
+# Always mkdir a path (this doesn't inhibit functionality to make a single dir)
+alias mkdir='mkdir -p'
+
+
+# git aliases
+#alias ga='git add'
+#alias gaa='git add all'
+#alias gco='git checkout'
+#alias gcb='git checkout -b'
+#alias gcmsg='git commit --message'
+#alias gd='git diff'
+#alias gl='git pull'
+#alias gp='git push'
+#alias gpsup='git push --set-upstream origin $(git_current_branch)'
+#alias gst='git status'
+
+
+alias open="xdg-open $1"
+alias opendir="dolphin ."
+
+alias docker="sudo docker"
+alias dockerstart="sudo systemctl start docker"
+alias dockerstop="sudo systemctl stop docker"
+alias dockerls="sudo docker container ls"
+
+
+alias pgstart="echo 'starting PostgreSQL...' && \
+    echo && \
+    sudo docker start postgresql && \
+    sudo docker ps -f name=postgresql && \
+    echo && \
+    echo 'PostgreSQL docker container started...' && \
+    echo 'starting pgAdmin4...' && \
+    sudo docker start pgAdmin && \
+    echo 'Username: pguser' && \
+    echo 'Password: pgpass' && \
+    ip=\$(sudo docker inspect postgresql | grep -Po '\"IPAddress\":\s*\"\K[0-9.]+(?=\")' | head -n 1) && \
+    pgadmin_ip=\$(sudo docker inspect pgAdmin | grep -Po '\"IPAddress\":\s*\"\K[0-9.]+(?=\")' | head -n 1) && \
+    echo 'Postgres IP Address: ' \$ip && \
+    echo && \
+    echo 'pgAdmin IP Address: ' \$pgadmin_ip && \
+    echo 'E-mail: drunkleen@local.com ' && \
+    echo 'Password: 12345' && \
+    echo 'IP Address: ' \$ip && \
+    echo && \
+    echo 'PostgreSQL connection string: postgres://pguser:pgpass@'\$ip':5432/DatabaseName' && \
+    echo 'pgAdmin4 URL: http://'\$pgadmin_ip':80' && \
+    echo"
+
+alias pgstop="echo 'stopping PostgreSQL...' && \
+    echo && \
+    sudo docker stop postgresql && \
+    echo 'PostgreSQL docker container stopped...' && \
+    sudo docker stop pgAdmin && \
+    echo 'pgAdmin4 docker container stopped...'"
+
+
+alias mongostart=" echo 'starting MongoDB...' && \
+    echo && \
+    sudo docker start mongodb && \
+    sudo docker ps -f name=mongodb && \
+    echo && \
+    echo 'mongoDB docker container started...' && \
+    echo 'URL: mongodb://localhost:27017' && \
+    echo 'IP Address: 127.0.0.1'"
+
+
+alias mongostop=" echo 'stopping MongoDB...' && \
+    echo && sudo docker stop mongodb && \
+    echo 'mongoDB docker container stopped...'"
+
+
+alias searxstart=" echo 'starting SearX...' && \
+    sudo docker start searx && \
+    sudo docker ps -f name=searx && \
+    echo && \
+    echo 'SearX docker container started...' && \
+    echo -e '\e]8;;http:127.0.0.1:80\e\\SearX Engine Running\e]8;;\e\\'"
+
+
+alias searxstop=" echo 'stopping SearX...' && echo && \
+    sudo docker stop searx && \
+    echo 'SearX docker container stopped...'"
+
+
+
+# monitor
+alias monitoroff="xrandr --output eDP-2 --off"
+alias monitoron="xrandr --output eDP-2 --auto"
