@@ -91,7 +91,8 @@ fi
 # Display Pokemon
 #pokemon-colorscripts --no-title -r 1,3,6
 
-
+# ctrl + R
+source <(fzf --zsh)
 
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
