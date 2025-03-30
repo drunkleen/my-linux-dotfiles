@@ -2,41 +2,260 @@
 alias c='clear' # clear terminal
 alias l='eza -lh --icons=auto' # long list
 alias ld='eza -lhD --icons=auto' # long list dirs
-alias un='$aurhelper -Rns' # uninstall package
-alias up='$aurhelper -Syu' # update system/package/aur
-alias pl='$aurhelper -Qs' # list installed package
-alias pa='$aurhelper -Ss' # list available package
-alias pc='$aurhelper -Sc' # remove unused cache
-alias po='$aurhelper -Qtdq | $aurhelper -Rns -' # remove unused packages, also try > $aurhelper -Qqd | $aurhelper -Rsu --print -
+# alias un='$aurhelper -Rns' # uninstall package
+# alias up='$aurhelper -Syu' # update system/package/aur
+# alias pl='$aurhelper -Qs' # list installed package
+# alias pa='$aurhelper -Ss' # list available package
+# alias pc='$aurhelper -Sc' # remove unused cache
+# alias po='$aurhelper -Qtdq | $aurhelper -Rns -' # remove unused packages, also try > $aurhelper -Qqd | $aurhelper -Rsu --print -
 alias vc='code' # gui code editor
 
 
+alias lz='ls'
 alias ls='eza -a --icons'
 alias ll='eza -al --icons'
 alias lt='eza -a --tree --level=1 --icons'
 
 
 ### aliases
-# Update package database and upgrade all installed packages
-alias update='sudo pacman -Syu'
+function update() {
+    echo "🔄 Checking for updates..."
+
+    # Update system packages
+    sudo pacman -Syu
+    pacman_status=$?
+
+    if [[ $pacman_status -eq 0 ]]; then
+        if pacman -Qu | grep -q .; then
+            echo "✅ System packages updated successfully!"
+        else
+            echo "ℹ️ No updates available for system packages."
+        fi
+    else
+        echo "❌ Failed to update system packages!"
+        return 1
+    fi
+
+    # Check if yay is installed
+    if command -v yay &>/dev/null; then
+        echo "🔄 Checking for AUR updates..."
+        yay -Syu
+        yay_status=$?
+
+        if [[ $yay_status -eq 0 ]]; then
+            if yay -Qu | grep -q .; then
+                echo "✅ AUR packages updated successfully!"
+            else
+                echo "ℹ️ No updates available for AUR packages."
+            fi
+        else
+            echo "❌ Failed to update AUR packages!"
+            return 1
+        fi
+    else
+        echo "⚠️ yay is not installed! Skipping AUR updates..."
+    fi
+
+    echo "🎉 System update process completed!"
+}
+
+
 
 # Install one or more packages
-alias install='sudo pacman -S'
+function install() {
+    if [[ $# -eq 0 ]]; then
+        echo "❌ Please specify a package to install."
+        return 1
+    fi
+
+    echo "🔄 Installing: $* ..."
+    sudo pacman -S "$@"
+
+    if [[ $? -eq 0 ]]; then
+        echo "✅ Installation successful!"
+    else
+        echo "❌ Installation failed!"
+    fi
+}
 
 # Remove a package
-alias remove='sudo pacman -R'
+function remove() {
+    if [[ $# -eq 0 ]]; then
+        echo "❌ Please specify a package to remove."
+        return 1
+    fi
+
+    echo "🗑️ Removing: $* ..."
+    sudo pacman -R "$@"
+
+    if [[ $? -eq 0 ]]; then
+        echo "✅ Package removed successfully!"
+    else
+        echo "❌ Failed to remove package!"
+    fi
+}
 
 # Remove a package and its dependencies
-alias remove-deps='sudo pacman -Rns'
+function remove_deps() {
+    if [[ $# -eq 0 ]]; then
+        echo "❌ Please specify a package to remove along with dependencies."
+        return 1
+    fi
+
+    echo "🗑️ Removing package and dependencies: $* ..."
+    sudo pacman -Rns "$@"
+
+    if [[ $? -eq 0 ]]; then
+        echo "✅ Package and dependencies removed successfully!"
+    else
+        echo "❌ Failed to remove package and dependencies!"
+    fi
+}
 
 # Search for a package in the repositories
-alias search='pacman -Ss'
+function search() {
+    if [[ $# -eq 0 ]]; then
+        echo "❌ Please specify a package to search for."
+        return 1
+    fi
+
+    echo "🔎 Searching for: $* ..."
+    pacman -Ss "$@"
+
+    if [[ $? -eq 0 ]]; then
+        echo "✅ Search completed!"
+    else
+        echo "❌ Search failed!"
+    fi
+}
 
 # List installed packages
-alias list='pacman -Q'
+function list() {
+    echo "📦 Listing installed packages..."
+    pacman -Q
+
+    if [[ $? -eq 0 ]]; then
+        echo "✅ Packages listed successfully!"
+    else
+        echo "❌ Failed to list packages!"
+    fi
+}
 
 # Show information about a specific package
-alias info='pacman -Qi'
+function info() {
+    if [[ $# -eq 0 ]]; then
+        echo "❌ Please specify a package to get info."
+        return 1
+    fi
+
+    echo "ℹ️ Getting information for: $* ..."
+    pacman -Qi "$@"
+
+    if [[ $? -eq 0 ]]; then
+        echo "✅ Package info displayed successfully!"
+    else
+        echo "❌ Failed to retrieve package info!"
+    fi
+}
+
+# Install one or more AUR packages
+function aur_install() {
+    if [[ $# -eq 0 ]]; then
+        echo "❌ Please specify an AUR package to install."
+        return 1
+    fi
+
+    echo "🔄 Installing AUR package(s): $* ..."
+    yay -S "$@"
+
+    if [[ $? -eq 0 ]]; then
+        echo "✅ AUR package(s) installed successfully!"
+    else
+        echo "❌ Failed to install AUR package(s)!"
+    fi
+}
+
+# Remove an AUR package
+function aur_remove() {
+    if [[ $# -eq 0 ]]; then
+        echo "❌ Please specify an AUR package to remove."
+        return 1
+    fi
+
+    echo "🗑️ Removing AUR package: $* ..."
+    yay -R "$@"
+
+    if [[ $? -eq 0 ]]; then
+        echo "✅ AUR package removed successfully!"
+    else
+        echo "❌ Failed to remove AUR package!"
+    fi
+}
+
+# Remove an AUR package and its dependencies
+function aur_remove_deps() {
+    if [[ $# -eq 0 ]]; then
+        echo "❌ Please specify an AUR package to remove along with dependencies."
+        return 1
+    fi
+
+    echo "🗑️ Removing AUR package and dependencies: $* ..."
+    yay -Rns "$@"
+
+    if [[ $? -eq 0 ]]; then
+        echo "✅ AUR package and dependencies removed successfully!"
+    else
+        echo "❌ Failed to remove AUR package and dependencies!"
+    fi
+}
+
+# Search for an AUR package
+function aur_search() {
+    if [[ $# -eq 0 ]]; then
+        echo "❌ Please specify an AUR package to search for."
+        return 1
+    fi
+
+    echo "🔎 Searching for AUR package: $* ..."
+    yay -Ss "$@"
+
+    if [[ $? -eq 0 ]]; then
+        echo "✅ Search completed!"
+    else
+        echo "❌ Search failed!"
+    fi
+}
+
+# List installed AUR packages
+function aur_list() {
+    echo "📦 Listing installed AUR packages..."
+    yay -Qm  # Lists only AUR packages
+
+    if [[ $? -eq 0 ]]; then
+        echo "✅ Installed AUR packages listed successfully!"
+    else
+        echo "❌ Failed to list AUR packages!"
+    fi
+}
+
+# Show information about a specific AUR package
+function aur_info() {
+    if [[ $# -eq 0 ]]; then
+        echo "❌ Please specify an AUR package to get info."
+        return 1
+    fi
+
+    echo "ℹ️ Getting information for AUR package: $* ..."
+    yay -Qi "$@"
+
+    if [[ $? -eq 0 ]]; then
+        echo "✅ Package info displayed successfully!"
+    else
+        echo "❌ Failed to retrieve package info!"
+    fi
+}
+
+
 
 
 ### bindings
@@ -69,74 +288,155 @@ alias mkdir='mkdir -p'
 
 
 alias open="xdg-open $1"
-alias opendir="dolphin ."
+alias opendir="nautilus ."
+
 
 alias docker="sudo docker"
-alias dockerstart="sudo systemctl start docker"
-alias dockerstop="sudo systemctl stop docker"
-alias dockerls="sudo docker container ls"
 
+function dockerstart() {
+    echo "Starting Docker..."
+    sudo systemctl start docker
 
-alias pgstart="echo 'starting PostgreSQL...' && \
-    echo && \
-    sudo docker start postgresql && \
-    sudo docker ps -f name=postgresql && \
-    echo && \
-    echo 'PostgreSQL docker container started...' && \
-    echo 'starting pgAdmin4...' && \
-    sudo docker start pgAdmin && \
-    echo 'Username: pguser' && \
-    echo 'Password: pgpass' && \
-    ip=\$(sudo docker inspect postgresql | grep -Po '\"IPAddress\":\s*\"\K[0-9.]+(?=\")' | head -n 1) && \
-    pgadmin_ip=\$(sudo docker inspect pgAdmin | grep -Po '\"IPAddress\":\s*\"\K[0-9.]+(?=\")' | head -n 1) && \
-    echo 'Postgres IP Address: ' \$ip && \
-    echo && \
-    echo 'pgAdmin IP Address: ' \$pgadmin_ip && \
-    echo 'E-mail: drunkleen@local.com ' && \
-    echo 'Password: 12345' && \
-    echo 'IP Address: ' \$ip && \
-    echo && \
-    echo 'PostgreSQL connection string: postgres://pguser:pgpass@'\$ip':5432/DatabaseName' && \
-    echo 'pgAdmin4 URL: http://'\$pgadmin_ip':80' && \
-    echo"
+    if [[ $? -eq 0 ]]; then
+        echo "✅ Docker started successfully!"
+    else
+        echo "❌ Failed to start Docker!"
+    fi
+}
 
-alias pgstop="echo 'stopping PostgreSQL...' && \
-    echo && \
-    sudo docker stop postgresql && \
-    echo 'PostgreSQL docker container stopped...' && \
-    sudo docker stop pgAdmin && \
-    echo 'pgAdmin4 docker container stopped...'"
+function dockerstop() {
+    echo "Stopping Docker and its socket..."
+    sudo systemctl stop docker.socket
+    sudo systemctl stop docker.service
 
-
-alias mongostart=" echo 'starting MongoDB...' && \
-    echo && \
-    sudo docker start mongodb && \
-    sudo docker ps -f name=mongodb && \
-    echo && \
-    echo 'mongoDB docker container started...' && \
-    echo 'URL: mongodb://localhost:27017' && \
-    echo 'IP Address: 127.0.0.1'"
-
-
-alias mongostop=" echo 'stopping MongoDB...' && \
-    echo && sudo docker stop mongodb && \
-    echo 'mongoDB docker container stopped...'"
-
-
-alias searxstart=" echo 'starting SearX...' && \
-    sudo docker start searx && \
-    sudo docker ps -f name=searx && \
-    echo && \
-    echo 'SearX docker container started...' && \
-    echo -e '\e]8;;http:127.0.0.1:80\e\\SearX Engine Running\e]8;;\e\\'"
-
-
-alias searxstop=" echo 'stopping SearX...' && echo && \
-    sudo docker stop searx && \
-    echo 'SearX docker container stopped...'"
+    if ! systemctl is-active --quiet docker && ! systemctl is-active --quiet docker.socket; then
+        echo "✅ Docker and its socket stopped successfully!"
+    else
+        echo "❌ Failed to stop Docker or its socket!"
+    fi
+}
 
 
 
-# monitor
-alias monitoroff="xrandr --output eDP-2 --off"
-alias monitoron="xrandr --output eDP-2 --auto"
+
+function dockerlist() {
+    echo "Listing running Docker containers..."
+    sudo docker container ls
+
+    if [[ $? -eq 0 ]]; then
+        echo "✅ Docker containers listed successfully!"
+    else
+        echo "❌ Failed to list Docker containers!"
+    fi
+}
+
+
+function pgstart() {
+    echo "🚀 Starting PostgreSQL..."
+    echo
+    sudo docker start postgresql
+
+    if [[ $? -eq 0 ]]; then
+        sudo docker ps -f name=postgresql
+        echo "✅ PostgreSQL container started."
+    else
+        echo "❌ Failed to start PostgreSQL container."
+        return 1
+    fi
+
+    echo "🚀 Starting pgAdmin4..."
+    sudo docker start pgAdmin
+
+    if [[ $? -eq 0 ]]; then
+        echo "✅ pgAdmin container started."
+    else
+        echo "❌ Failed to start pgAdmin container."
+        return 1
+    fi
+
+    local ip=$(sudo docker inspect postgresql | grep -Po '\"IPAddress\":\s*\"\K[0-9.]+' | head -n 1)
+    local pgadmin_ip=$(sudo docker inspect pgAdmin | grep -Po '\"IPAddress\":\s*\"\K[0-9.]+' | head -n 1)
+
+    echo
+    echo "🧠 PostgreSQL IP Address: $ip"
+    echo "🔧 Connection string: postgres://pguser:pgpass@${ip}:5432/potgres"
+    echo
+    echo "🌐 pgAdmin IP Address: $pgadmin_ip"
+    echo "🔐 Login: drunkleen@local.com / 12345"
+    echo "🌍 pgAdmin URL: http://${pgadmin_ip}:80"
+}
+
+
+function pgstop() {
+    echo "🛑 Stopping PostgreSQL..."
+    sudo docker stop postgresql && echo "✅ PostgreSQL container stopped." || echo "❌ Failed to stop PostgreSQL."
+
+    echo "🛑 Stopping pgAdmin..."
+    sudo docker stop pgAdmin && echo "✅ pgAdmin container stopped." || echo "❌ Failed to stop pgAdmin."
+}
+
+
+
+function mongostart() {
+    echo "🚀 Starting MongoDB..."
+    echo
+    sudo docker start mongodb
+
+    if [[ $? -eq 0 ]]; then
+        sudo docker ps -f name=mongodb
+        echo "✅ MongoDB container started."
+        echo "🔗 URL: mongodb://localhost:27017"
+        echo "🌐 IP Address: 127.0.0.1"
+    else
+        echo "❌ Failed to start MongoDB container."
+    fi
+}
+
+function mongostop() {
+    echo "🛑 Stopping MongoDB..."
+    sudo docker stop mongodb && echo "✅ MongoDB container stopped." || echo "❌ Failed to stop MongoDB."
+}
+
+
+
+
+function searxstart() {
+    echo "🚀 Starting SearX..."
+    sudo docker start searx
+
+    if [[ $? -eq 0 ]]; then
+        sudo docker ps -f name=searx
+        echo "✅ SearX container started."
+        echo -e "🔗 \e]8;;http://127.0.0.1:80\e\\SearX Engine Running\e]8;;\e\\"
+    else
+        echo "❌ Failed to start SearX container."
+    fi
+}
+
+function searxstop() {
+    echo "🛑 Stopping SearX..."
+    sudo docker stop searx && echo "✅ SearX container stopped." || echo "❌ Failed to stop SearX."
+}
+
+function redisstart() {
+    echo "🚀 Starting Redis..."
+    sudo docker start redis
+
+    if [[ $? -eq 0 ]]; then
+        sudo docker ps -f name=redis
+        echo "✅ Redis container started."
+        
+        # Get the container's IP address
+        local ip=$(sudo docker inspect redis | grep -Po '\"IPAddress\":\s*\"\K[0-9.]+' | head -n 1)
+
+        echo "🔗 Redis connection URL: redis://$ip:6379"
+        echo "🌐 IP Address: $ip"
+    else
+        echo "❌ Failed to start Redis container."
+    fi
+}
+
+function redisstop() {
+    echo "🛑 Stopping Redis..."
+    sudo docker stop redis && echo "✅ Redis container stopped." || echo "❌ Failed to stop Redis."
+}
