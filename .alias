@@ -440,3 +440,129 @@ function redisstop() {
     echo "🛑 Stopping Redis..."
     sudo docker stop redis && echo "✅ Redis container stopped." || echo "❌ Failed to stop Redis."
 }
+
+
+function ollama_pull() {
+    if [[ $# -eq 0 ]]; then
+        echo "❌ Please specify a model to pull (e.g., llama2, mistral)."
+        return 1
+    fi
+
+    echo "📥 Pulling model: $1 ..."
+    sudo docker exec ollama ollama pull "$1"
+
+    if [[ $? -eq 0 ]]; then
+        echo "✅ Model '$1' pulled successfully."
+    else
+        echo "❌ Failed to pull model '$1'."
+    fi
+}
+
+
+function ollama_delete() {
+    if [[ $# -eq 0 ]]; then
+        echo "❌ Please specify a model to delete."
+        return 1
+    fi
+
+    echo "🗑️ Deleting model: $1 ..."
+    sudo docker exec ollama ollama delete "$1"
+
+    if [[ $? -eq 0 ]]; then
+        echo "✅ Model '$1' deleted successfully."
+    else
+        echo "❌ Failed to delete model '$1'."
+    fi
+}
+
+
+
+function ollama_list() {
+    echo "📂 Listing installed models..."
+    sudo docker exec ollama ollama list
+}
+
+
+
+function ollama_bootstrap() {
+    local models=("deepseek-r1" "llama3.2")
+
+    for model in "${models[@]}"; do
+        echo "📥 Pulling model: $model ..."
+        sudo docker exec ollama ollama pull "$model"
+        if [[ $? -eq 0 ]]; then
+            echo "✅ Model '$model' pulled successfully."
+        else
+            echo "❌ Failed to pull model '$model'."
+        fi
+    done
+}
+
+
+function ollama_preload() {
+    local models=("deepseek-r1" "llama3.2")
+
+    for model in "${models[@]}"; do
+        echo "⚙️ Loading model '$model' into memory..."
+        sudo docker exec ollama ollama run "$model" <<< "Hello"
+        if [[ $? -eq 0 ]]; then
+            echo "✅ Model '$model' loaded successfully."
+        else
+            echo "❌ Failed to load model '$model'."
+        fi
+    done
+}
+
+function ollama_chat() {
+    if [[ $# -lt 2 ]]; then
+        echo "❌ Usage: ollama_chat <model> <prompt>"
+        echo "👉 Example: ollama_chat deepseek-r1 'Write a Python function to sort a list.'"
+        return 1
+    fi
+
+    local model="$1"
+    shift
+    local prompt="$*"
+
+    echo "🧠 Chatting with model '$model'..."
+    sudo docker exec -i ollama ollama run "$model" <<< "$prompt"
+}
+
+function ollamastart() {
+    echo "🚀 Starting Ollama..."
+    sudo docker start ollama && echo "✅ Ollama started." || echo "❌ Ollama failed to start."
+
+    echo "🚀 Starting Open WebUI..."
+    sudo docker start open-webui && echo "✅ Open WebUI started." || echo "❌ Open WebUI failed to start."
+}
+
+function ollamastop() {
+    echo "🛑 Stopping Open WebUI..."
+    sudo docker stop open-webui && echo "✅ WebUI stopped." || echo "❌ Failed to stop WebUI."
+
+    echo "🛑 Stopping Ollama..."
+    sudo docker stop ollama && echo "✅ Ollama stopped." || echo "❌ Failed to stop Ollama."
+}
+
+function ollama_ip() {
+    local ip=$(sudo docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ollama)
+    echo "🌐 Ollama container IP: http://$ip:11434"
+}
+
+function openwebui_ip() {
+    local ip=$(sudo docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' open-webui)
+    echo "🌐 Open WebUI container IP: http://$ip:8080"
+}
+
+function gpt_start() {
+    echo "🚀 Starting GPT..."
+    ollamastart
+    ollama_preload
+    ollama_ip
+    openwebui_ip
+}
+
+function gpt_stop() {
+    echo "🛑 Stopping GPT..."
+    ollamastop
+}
