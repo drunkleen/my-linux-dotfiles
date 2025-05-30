@@ -1,6 +1,6 @@
-if [ -z "$TMUX" ]; then
-    tmux
-fi
+# if [ -z "$TMUX" ]; then
+#     tmux
+# fi
 
 
 # Oh-my-zsh installation path
@@ -18,7 +18,7 @@ plugins=(
   zsh-syntax-highlighting
   archlinux
   fzf-tab
-  you-should-use
+  # you-should-use
   zsh-bat
   pyenv
 )
@@ -87,6 +87,12 @@ else
     export EDITOR='vim'
 fi
 
+# Start ssh-agent if not running and add GitHub key
+if ! pgrep -u "$USER" ssh-agent > /dev/null; then
+  eval "$(ssh-agent -s)"
+  ssh-add ~/.ssh/id_ed25519 > /dev/null
+  ssh-add ~/.ssh/aur > /dev/null
+fi
 
 # Display Pokemon
 #pokemon-colorscripts --no-title -r 1,3,6
@@ -94,10 +100,13 @@ fi
 # ctrl + R
 source <(fzf --zsh)
 
+export PATH=$PATH:$HOME/go/bin
+
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 export MOZ_ENABLE_WAYLAND=1
 
-neofetch
+# neofetch
+fortune | cowsay | leenfetch
