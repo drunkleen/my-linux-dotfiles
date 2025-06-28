@@ -1,6 +1,6 @@
-# if [ -z "$TMUX" ]; then
-#     tmux
-# fi
+if [ -z "$TMUX" ]; then
+    tmux
+fi
 
 
 # Oh-my-zsh installation path
@@ -88,14 +88,12 @@ else
 fi
 
 # Start ssh-agent if not running and add GitHub key
-if ! pgrep -u "$USER" ssh-agent > /dev/null; then
-  eval "$(ssh-agent -s)"
-  ssh-add ~/.ssh/id_ed25519 > /dev/null
-  ssh-add ~/.ssh/aur > /dev/null
-fi
+# if ! pgrep -u "$USER" ssh-agent > /dev/null; then
+#   eval "$(ssh-agent -s)"
+#   ssh-add ~/.ssh/github > /dev/null
+#   ssh-add ~/.ssh/aur > /dev/null
+# fi
 
-# Display Pokemon
-#pokemon-colorscripts --no-title -r 1,3,6
 
 # ctrl + R
 source <(fzf --zsh)
@@ -108,5 +106,7 @@ export NVM_DIR="$HOME/.nvm"
 
 export MOZ_ENABLE_WAYLAND=1
 
-# neofetch
-fortune | cowsay | leenfetch
+
+ fortune | cowsay | leenfetch
+
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
