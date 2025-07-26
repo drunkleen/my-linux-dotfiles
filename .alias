@@ -566,3 +566,63 @@ function gpt_stop() {
     echo "🛑 Stopping GPT..."
     ollamastop
 }
+
+
+
+function initmvn() {
+    CURRENT_DIR=$(pwd)
+    echo "Initializing Maven Project $1"
+
+    if [ -d "$FOLDER_PATH" ]; then
+        echo "❌ Directory exists: $1"
+        echo "❌ Failed to initialize Maven project!"
+        exit 1
+    fi
+
+    mkdir $1
+    
+    mvn archetype:generate -DgroupId=com.drunkleen.$1 -DartifactId=$1 -DarchetypeArtifactId=maven-archetype-quickstart -DarchetypeVersion=1.5 -DinteractiveMode=false
+
+    touch ./$1/.env
+
+        curl -sS --fail -o ./$1/.gitignore https://raw.githubusercontent.com/github/gitignore/refs/heads/main/Maven.gitignore || { echo "Failed to fetch .gitignore"; exit 1; }
+
+    if [[ $? -eq 0 ]]; then
+        echo "✅ Maven project successfully initialized."
+    else
+        echo "❌ Failed to initialize Maven project!"
+    fi
+    
+    cd $CURRENT_DIR
+}
+
+
+function initgo() {
+    CURRENT_DIR=$(pwd)
+    echo "Initializing Go Project $1..."
+
+    if [ -d "$FOLDER_PATH" ]; then
+        echo "❌ Directory exists: $1"
+        echo "❌ Failed to initialize Go project!"
+        exit 1
+    fi
+
+    mkdir $1
+    cd $1
+
+    go mod init "github.com/drunkleen/$1"
+
+    touch main.go
+    touch .env
+
+    curl -sS --fail -o .gitignore https://raw.githubusercontent.com/github/gitignore/refs/heads/main/community/Golang/Go.AllowList.gitignore || { echo "Failed to fetch .gitignore"; exit 1; }
+
+    if [[ $? -eq 0 ]]; then
+        echo "✅ Go project successfully initialized."
+    else
+        echo "❌ Failed to initialize Go project!"
+    fi
+
+    cd $CURRENT_DIR
+}
+
