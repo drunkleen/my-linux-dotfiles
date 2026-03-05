@@ -1,0 +1,4 @@
+# [opener]
+# smart = [
+#   { run = "~/.config/yazi/scripts/open $1", desc = "Smart open", block = false }
+# ]

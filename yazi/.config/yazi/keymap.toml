@@ -1,0 +1,4 @@
+# [keymap]
+# normal = [
+#   { on = "enter", run = "open smart", desc = "Smart open" },
+# ]

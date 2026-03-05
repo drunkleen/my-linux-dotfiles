@@ -1,0 +1,3 @@
+[submodule "leenium/.local/share/leenium"]
+	path = leenium/.local/share/leenium
+	url = https://github.com/basecamp/omarchy.git
