@@ -1,3 +1,6 @@
 [submodule "leenium/.local/share/leenium"]
 	path = leenium/.local/share/leenium
 	url = https://github.com/basecamp/omarchy.git
+[submodule "nvim/.config/nvim"]
+	path = nvim/.config/nvim
+	url = https://github.com/drunkleen/neovim-configs.git
