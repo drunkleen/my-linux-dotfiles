@@ -42,7 +42,7 @@ source $ZSH/oh-my-zsh.sh
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # ctrl + R
-# source <(fzf --zsh)
+source <(fzf --zsh)
 
 export SSH_AUTH_SOCK="$HOME/.ssh/ssh-agent.sock"
 
