@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Pi-Apps Updater
+Exec=/home/anakin/pi-apps/updater onboot
+Icon=/home/anakin/pi-apps/icons/logo.png
+Terminal=false
+StartupWMClass=Pi-Apps
+Type=Application
+X-GNOME-Autostart-enabled=true
+Hidden=false
+NoDisplay=false

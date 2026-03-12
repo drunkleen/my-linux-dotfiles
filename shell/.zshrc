@@ -2,7 +2,9 @@
 #     tmux
 # fi
 
-fortune | cowsay | leenfetch
+leenfetch
+
+export PATH="$HOME/.local/bin:$PATH:$HOME/go/bin"
 
 eval "$(mise activate zsh)"
 
@@ -39,11 +41,9 @@ source $ZSH/oh-my-zsh.sh
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # ctrl + R
-source <(fzf --zsh)
+# source <(fzf --zsh)
 
 export SSH_AUTH_SOCK="$HOME/.ssh/ssh-agent.sock"
-
-export PATH="$HOME/.local/bin:$PATH:$HOME/go/bin"
 
 # export MOZ_ENABLE_WAYLAND=1
 

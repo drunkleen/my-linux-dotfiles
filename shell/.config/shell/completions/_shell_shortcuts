@@ -1,6 +1,6 @@
-#compdef open opendir vc cat vim lz ls l ll ld lt mkdir update pkg aur docker dockerstart dockerstop dockerlist postgres mongo redis searx initmvn initgo send-notif iporigin ips shellhelp
+#compdef open opendir vc cat vim lz ls l ll ld lt mkdir update pkg docker dockerstart dockerstop dockerlist postgres mongo redis searx initmvn initgo send-notif iporigin ips shellhelp
 
-local -a pacman_pkgs installed_pkgs aur_installed_pkgs iface_names
+local -a pacman_pkgs installed_pkgs iface_names
 
 _shell_shortcuts_pkg_available() {
   pacman_pkgs=(${(f)"$(pacman -Slq 2>/dev/null | sort -u)"})
@@ -12,10 +12,6 @@ _shell_shortcuts_pkg_installed() {
   (( ${#installed_pkgs[@]} )) && _describe 'installed packages' installed_pkgs
 }
 
-_shell_shortcuts_pkg_aur_installed() {
-  aur_installed_pkgs=(${(f)"$(pacman -Qmq 2>/dev/null | sort -u)"})
-  (( ${#aur_installed_pkgs[@]} )) && _describe 'installed AUR packages' aur_installed_pkgs
-}
 
 _shell_shortcuts_pkg_subcommands() {
   local -a subcmds
@@ -32,20 +28,6 @@ _shell_shortcuts_pkg_subcommands() {
   _describe 'pkg commands' subcmds
 }
 
-_shell_shortcuts_aur_subcommands() {
-  local -a subcmds
-  subcmds=(
-    'update:update AUR packages'
-    'install:install AUR package(s)'
-    'remove:remove AUR package(s)'
-    'remove-deps:remove AUR package(s) and dependencies'
-    'search:search AUR packages'
-    'list:list installed AUR packages'
-    'info:show AUR package info'
-    'help:show aur help'
-  )
-  _describe 'aur commands' subcmds
-}
 
 _shell_shortcuts_container_subcommands() {
   local -a subcmds
@@ -77,29 +59,6 @@ case "$service" in
           ;;
         remove|remove-deps)
           _shell_shortcuts_pkg_installed || _message 'installed package'
-          ;;
-        search)
-          _message 'query'
-          ;;
-        update|list|help)
-          _nothing
-          ;;
-        *)
-          _default
-          ;;
-      esac
-    fi
-    ;;
-  aur)
-    if (( CURRENT == 2 )); then
-      _shell_shortcuts_aur_subcommands
-    else
-      case "${words[2]:-}" in
-        install|info)
-          _message 'AUR package'
-          ;;
-        remove|remove-deps)
-          _shell_shortcuts_pkg_aur_installed || _message 'installed AUR package'
           ;;
         search)
           _message 'query'

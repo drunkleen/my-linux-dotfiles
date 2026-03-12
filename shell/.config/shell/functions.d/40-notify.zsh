@@ -1,7 +1,7 @@
 send-notif() {
   local ntfy_topic="u6Wn2kcJvg0Wvm58i9ct3JuzFdETESwFh6mtFswx7JWLGuyFVf1gbNaYsUjKXunA"
   local ntfy_url="https://ntfy.sh/${ntfy_topic}"
-  local ntfy_title="Archlinux - Hogwarts"
+  local ntfy_title="pi5 - Galaxy"
   local raw message
 
   command -v curl >/dev/null 2>&1 || {
