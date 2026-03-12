@@ -36,6 +36,7 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
+[[ -f "$HOME/.env" ]] && source "$HOME/.env"
 [[ -f "$HOME/.config/shell/.alias" ]] && source "$HOME/.config/shell/.alias"
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh
