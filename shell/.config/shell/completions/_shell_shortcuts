@@ -3,12 +3,12 @@
 local -a apt_pkgs installed_pkgs iface_names
 
 _shell_shortcuts_pkg_available() {
-  apt_pkgs=(${(f)"$(apt -Slq 2>/dev/null | sort -u)"})
+  apt_pkgs=(${(f)"$(apt-cache pkgnames 2>/dev/null | sort -u)"})
   (( ${#apt_pkgs[@]} )) && _describe 'packages' apt_pkgs
 }
 
 _shell_shortcuts_pkg_installed() {
-  installed_pkgs=(${(f)"$(apt -Qq 2>/dev/null | sort -u)"})
+  installed_pkgs=(${(f)"$(dpkg-query -W -f='${binary:Package}\n' 2>/dev/null | sort -u)"})
   (( ${#installed_pkgs[@]} )) && _describe 'installed packages' installed_pkgs
 }
 

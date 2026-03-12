@@ -1,108 +1,48 @@
 # dotfiles
 
-Personal Linux dotfiles managed with [GNU Stow](https://www.gnu.org/software/stow/).
+Personal Raspberry Pi 5 dotfiles managed with [GNU Stow](https://www.gnu.org/software/stow/).
 
-This repository is built around a Wayland desktop workflow with Hyprland, a structured Zsh shell setup, tmux, Neovim, and a small layer of custom shell utilities.
+This `pi5` branch is a compact Debian/Raspberry Pi focused setup centered on:
 
-## What This Repo Covers
+- Zsh with a structured custom command layer
+- tmux with keyboard-heavy pane and session management
+- tool/runtime management through `mise`
+- terminal utilities such as `btop`, `lazygit`, and `leenfetch`
+- Docker-based local service wrappers for development databases
+- a standalone `ntool` utility for local network and service inspection
 
-- Stow-managed home-directory packages
-- Hyprland desktop configuration and companion Wayland tools
-- Zsh shell setup with grouped aliases, functions, completions, and theming
-- tmux configuration under `~/.config/tmux/tmux.conf`
-- Neovim, terminal, notification, launcher, and status bar configs
-- Small operational helpers such as:
-  - `shellhelp`
-  - `ntool`
-  - `pkg` / `aur` / `update`
-  - `postgres` / `mongo` / `redis` / `searx`
+## Repository Layout
 
-## Repository Model
+Each top-level directory is a Stow package targeted at `~/` via [`.stowrc`](/home/anakin/dotfiles/.stowrc).
 
-Each top-level directory is a Stow package.
+Current packages:
 
-The repository uses this Stow target:
-
-```text
-~/
-```
-
-That comes from [`.stowrc`](/home/snape/dotfiles/.stowrc):
-
-```text
---target=~
---verbose
---restow
-```
-
-In practice, a package such as:
-
-```text
-shell/.zshrc
-```
-
-is linked to:
-
-```text
-~/.zshrc
-```
-
-## Top-Level Packages
-
-Current packages in this repo:
-
-- `alacritty`
 - `autostart`
 - `btop`
-- `elephant`
-- `fontconfig`
-- `ghostty`
-- `hypr`
-- `hyprland-preview-share-picker`
-- `kitty`
 - `lazygit`
 - `leenfetch`
-- `mako`
 - `mise`
 - `nvim`
-- `nwg-displays`
 - `shell`
 - `tmux`
-- `uwsm`
-- `walker`
-- `waybar`
 
-## Key Paths
+Example:
 
-Important package entrypoints:
-
-- [shell](/home/snape/dotfiles/shell)
-  - [`.zshrc`](/home/snape/dotfiles/shell/.zshrc)
-  - [`.config/shell/.alias`](/home/snape/dotfiles/shell/.config/shell/.alias)
-  - [`.config/shell/aliases.d`](/home/snape/dotfiles/shell/.config/shell/aliases.d)
-  - [`.config/shell/functions.d`](/home/snape/dotfiles/shell/.config/shell/functions.d)
-  - [`.config/shell/completions`](/home/snape/dotfiles/shell/.config/shell/completions)
-  - [`.config/shell/ntool`](/home/snape/dotfiles/shell/.config/shell/ntool)
-- [tmux](/home/snape/dotfiles/tmux)
-  - [`.config/tmux/tmux.conf`](/home/snape/dotfiles/tmux/.config/tmux/tmux.conf)
-- [hypr](/home/snape/dotfiles/hypr)
-- [waybar](/home/snape/dotfiles/waybar)
-- [walker](/home/snape/dotfiles/walker)
-- [nvim](/home/snape/dotfiles/nvim)
-- [kitty](/home/snape/dotfiles/kitty)
-- [ghostty](/home/snape/dotfiles/ghostty)
-- [alacritty](/home/snape/dotfiles/alacritty)
+```text
+shell/.zshrc -> ~/.zshrc
+tmux/.config/tmux/tmux.conf -> ~/.config/tmux/tmux.conf
+```
 
 ## Quick Start
 
-Clone into `~/dotfiles`:
+Clone and enter the repo:
 
 ```bash
-git clone <your-repo-url> ~/dotfiles
+git clone <repo-url> ~/dotfiles
 cd ~/dotfiles
 ```
 
-Dry-run first:
+Preview links first:
 
 ```bash
 stow -n -v */
@@ -114,261 +54,225 @@ Apply everything:
 stow */
 ```
 
-Or start with a smaller set:
+Apply only the core shell environment:
 
 ```bash
-stow shell tmux nvim kitty
-stow hypr waybar walker uwsm mako
+stow shell tmux mise btop lazygit leenfetch autostart
 ```
 
-## Updating Links
-
-Re-apply all links after changes:
-
-```bash
-stow */
-```
-
-Re-apply only one package:
-
-```bash
-stow shell
-```
-
-Remove one package’s links:
+Remove one package:
 
 ```bash
 stow -D shell
 ```
 
-Preview changes without touching the filesystem:
+## What Each Package Does
 
-```bash
-stow -n -v shell
-```
+### `shell`
 
-## Conflict Handling
+Main interactive environment:
 
-If Stow reports an existing file or directory in `$HOME`, move it out of the way first.
+- Zsh with Oh My Zsh, Powerlevel10k, `mise activate zsh`, and `leenfetch` on shell startup
+- grouped aliases, functions, theme variables, and completions
+- local binaries under `~/.local/bin`
+- Git identity defaults from [`.gitconfig`](/home/anakin/dotfiles/shell/.gitconfig)
 
-Examples:
+Important files:
 
-```bash
-mv ~/.zshrc ~/.zshrc.bak
-stow shell
-```
+- [shell/.zshrc](/home/anakin/dotfiles/shell/.zshrc)
+- [shell/.config/shell/.alias](/home/anakin/dotfiles/shell/.config/shell/.alias)
+- [shell/.config/shell/aliases.d/10-navigation.zsh](/home/anakin/dotfiles/shell/.config/shell/aliases.d/10-navigation.zsh)
+- [shell/.config/shell/aliases.d/20-editor.zsh](/home/anakin/dotfiles/shell/.config/shell/aliases.d/20-editor.zsh)
+- [shell/.config/shell/aliases.d/30-containers.zsh](/home/anakin/dotfiles/shell/.config/shell/aliases.d/30-containers.zsh)
+- [shell/.config/shell/functions.d](/home/anakin/dotfiles/shell/.config/shell/functions.d)
+- [shell/.config/shell/ntool/ntool](/home/anakin/dotfiles/shell/.config/shell/ntool/ntool)
 
-```bash
-mv ~/.config/nvim ~/.config/nvim.bak
-stow nvim
-```
+#### Shell aliases
 
-## Shell Layer
+- `ls`, `l`, `ll`, `ld`, `lt` use `eza`
+- `lz` falls back to plain `ls`
+- `c`, `cls` clear the terminal
+- `..`, `...`, `.3`, `.4`, `.5` move up directory levels
+- `mkdir` is always `mkdir -p`
+- `vc` opens VS Code
+- `vim` maps to `nvim`
+- `cat` maps to `bat`
+- `docker` maps to `sudo docker`
 
-The shell configuration is intentionally structured instead of keeping everything in one monolithic file.
+#### Shell functions
 
-Layout:
+General:
 
-- [`.config/shell/.alias`](/home/snape/dotfiles/shell/.config/shell/.alias)
-  - bootstrap file
-  - sets completion path
-  - loads theme, aliases, and functions
-- [`.config/shell/theme.zsh`](/home/snape/dotfiles/shell/.config/shell/theme.zsh)
-  - shared color/icon variables
-- [`.config/shell/aliases.d`](/home/snape/dotfiles/shell/.config/shell/aliases.d)
-  - lightweight aliases
-- [`.config/shell/functions.d`](/home/snape/dotfiles/shell/.config/shell/functions.d)
-  - public shell commands
-- [`.config/shell/completions`](/home/snape/dotfiles/shell/.config/shell/completions)
-  - zsh completions for custom commands
+- `open <path-or-url>` opens via `xdg-open`
+- `opendir [path]` opens Nautilus or falls back to `open`
+- `shellhelp` prints the command catalog
 
-Useful shell commands:
+Package management:
 
-- `shellhelp`
-  - prints the custom command catalog
-- `update`
-  - updates repo packages and AUR packages
-- `pkg ...`
-  - repo package commands
-- `aur ...`
-  - AUR package commands
-- `postgres ...`, `mongo ...`, `redis ...`, `searx ...`
-  - container service commands
-- `ntool`
-  - local network/service utility
+- `update` runs the repo package update flow
+- `pkg update`
+- `pkg install <package...>`
+- `pkg remove <package...>`
+- `pkg remove-deps <package...>`
+- `pkg search <query>`
+- `pkg list`
+- `pkg info <package...>`
 
-## Package Commands
+Project bootstrapping:
 
-Repo package commands:
+- `initmvn <name>` creates a Maven quickstart project, `.env`, and `.gitignore`
+- `initgo <name>` creates a Go module, `main.go`, `.env`, and `.gitignore`
 
-```bash
-pkg update
-pkg install <pkg>
-pkg remove <pkg>
-pkg remove-deps <pkg>
-pkg search <query>
-pkg list
-pkg info <pkg>
-pkg help
-```
+Notifications and networking:
 
-AUR commands:
+- `send-notif <message>` sends a message to the configured `ntfy.sh` topic
+- `iporigin <ip|domain|url>` resolves a target and shows geo/IP ownership info
+- `ips` prints local IPv4/IPv6 addresses and public IPs
 
-```bash
-aur update
-aur install <pkg>
-aur remove <pkg>
-aur remove-deps <pkg>
-aur search <query>
-aur list
-aur info <pkg>
-aur help
-```
+Docker helpers:
 
-Combined update:
+- `dockerstart`
+- `dockerstop`
+- `dockerlist`
 
-```bash
-update
-```
+Database/service wrappers:
 
-## Container Commands
+- `postgres up|down|status|config|recreate`
+  - manages PostgreSQL plus pgAdmin
+  - supports custom image, port, database, user, password, and pgAdmin settings
+- `mongo up|down|status|config|recreate`
+- `redis up|down|status|config|recreate`
+- `searx up|down|status|config|recreate`
 
-Docker engine helpers:
+### `ntool`
 
-```bash
-dockerstart
-dockerstop
-dockerlist
-```
+`ntool` is installed from [shell/.local/bin/ntool](/home/anakin/dotfiles/shell/.local/bin/ntool) and implemented under [shell/.config/shell/ntool](/home/anakin/dotfiles/shell/.config/shell/ntool).
 
-Service-oriented helpers:
+It provides local network and service operations:
 
-```bash
-postgres up|down|status|config|recreate|help
-mongo up|down|status|config|recreate|help
-redis up|down|status|config|recreate|help
-searx up|down|status|config|recreate|help
-```
+- `ntool status` or `ntool summary`
+- `ntool watch [seconds]`
+- `ntool json`
+- `ntool ifaces`
+- `ntool ips`
+- `ntool ip <iface>`
+- `ntool devices`
+- `ntool routes`
+- `ntool gateway`
+- `ntool dns`
+- `ntool public-ip`
+- `ntool public-ip6`
+- `ntool ports`
+- `ntool ping <host>`
+- `ntool resolve <host>`
+- `ntool checks`
 
-Examples:
+Service control through `systemd`, WireGuard, and Tailscale:
 
-```bash
-postgres up
-postgres status
-postgres recreate --user snape --password secret --db app --port 5433
+- `ntool vpn on|off|status`
+- `ntool lan on|off|status`
+- `ntool ssh on|off|restart|status|enable|disable|port`
+- `ntool ts on|off|status|ip|peers`
+- `ntool tsd on|off|enable|disable`
 
-redis up
-redis config
-redis recreate --port 6380
+## Other Packages
 
-mongo up
-searx help
-```
+### `tmux`
 
-Note:
+[tmux/.config/tmux/tmux.conf](/home/anakin/dotfiles/tmux/.config/tmux/tmux.conf) sets:
 
-- `recreate` removes and rebuilds the container
-- non-persistent data inside the container is lost unless you mount volumes yourself
+- `C-Space` as the main prefix, with `C-b` kept as secondary
+- vi copy mode bindings
+- split panes in the current working directory
+- `Alt` window switching and `Ctrl+Alt` pane navigation
+- top status bar, mouse support, RGB colors, renumbered windows, and clipboard integration
 
-## `ntool`
+### `mise`
 
-`ntool` is a Bash-based command utility under:
+[mise/.config/mise/config.toml](/home/anakin/dotfiles/mise/.config/mise/config.toml) installs and manages:
 
-- [`.config/shell/ntool/ntool`](/home/snape/dotfiles/shell/.config/shell/ntool/ntool)
-- [`.local/bin/ntool`](/home/snape/dotfiles/shell/.local/bin/ntool)
+- `air`
+- `bat`
+- `docker-compose`
+- `fzf`
+- `go`
+- `gofumpt`
+- `java`
+- `maven`
+- `node`
+- `pipx`
+- `python`
+- `rust`
+- `rust-analyzer`
+- `tmux`
+- `yazi`
+- `zig`
+- `zls`
 
-It is split into focused modules inside:
+### `btop`
 
-- [`.config/shell/ntool/lib`](/home/snape/dotfiles/shell/.config/shell/ntool/lib)
+[btop/.config/btop/btop.conf](/home/anakin/dotfiles/btop/.config/btop/btop.conf) enables:
 
-Typical usage:
+- custom `current` theme
+- vim-style navigation
+- CPU, memory, network, and process panels
+- temperature, uptime, swap, disks, and battery display
 
-```bash
-ntool help
-ntool status
-ntool ifaces
-ntool routes
-ntool dns
-ntool checks
-ntool ts status
-```
+### `leenfetch`
 
-## tmux
+[leenfetch/.config/leenfetch/config.jsonc](/home/anakin/dotfiles/leenfetch/.config/leenfetch/config.jsonc) defines a custom multi-section fetch layout for:
 
-tmux is configured from:
+- system information
+- hardware information
+- OS age and uptime
 
-- [tmux.conf](/home/snape/dotfiles/tmux/.config/tmux/tmux.conf)
+### `lazygit`
 
-Current behavior includes:
+[lazygit/.config/lazygit/config.yml](/home/anakin/dotfiles/lazygit/.config/lazygit/config.yml) is tracked for user overrides. It is currently empty.
 
-- `zsh` as the default shell
-- `C-Space` as the main prefix
-- vi-style copy mode
-- pane navigation with `Ctrl+Alt+Arrow`
-- top status bar
-- base index `1`
+### `autostart`
 
-Reload tmux config:
+[autostart/.config/autostart/pi-apps-updater.desktop](/home/anakin/dotfiles/autostart/.config/autostart/pi-apps-updater.desktop) auto-starts the Pi-Apps updater on login.
 
-```bash
-tmux source-file ~/.config/tmux/tmux.conf
-```
+### `nvim`
 
-## Prerequisites
+The `nvim` Stow package exists, but there are currently no tracked Neovim config files inside [nvim/.config/nvim](/home/anakin/dotfiles/nvim/.config/nvim).
 
-Core requirements:
+## Dependencies and Assumptions
 
-- `git`
+This branch assumes a Debian/Raspberry Pi environment with most of the following available:
+
 - `stow`
 - `zsh`
-
-Common tools referenced by the configs:
-
-- `tmux`
-- `neovim`
-- `kitty`, `ghostty`, or `alacritty`
-- `hyprland`
-- `waybar`
-- `walker`
-- `uwsm`
-- `mako`
+- `oh-my-zsh`
+- `powerlevel10k`
 - `mise`
 - `eza`
 - `bat`
+- `curl`
 - `jq`
-- `ripgrep`
-- `fzf`
 - `docker`
-- `yay` for AUR helpers
+- `systemd`
+- `tmux`
+- `btop`
+- `leenfetch`
+- `code` and optionally `nautilus`
 
-## Maintenance Notes
+Some functions also depend on:
 
-- After changing shell functions, aliases, completions, or theme files:
+- `mvn` for `initmvn`
+- `go` for `initgo`
+- `wg` / `wg-quick` for WireGuard controls
+- `tailscale` for Tailscale controls
+- `nmcli` or `iwgetid` for Wi-Fi details
 
-```bash
-source ~/.zshrc
-```
-
-- After changing a stowed package layout:
-
-```bash
-stow shell
-```
-
-- If zsh completion behaves strangely, rebuild the completion cache:
+## Typical Workflow
 
 ```bash
-rm -f ~/.zcompdump*
-autoload -Uz compinit && compinit
-source ~/.zshrc
+stow shell tmux mise
+exec zsh
+shellhelp
+ntool status
+pkg update
+postgres up
 ```
-
-## Scope
-
-This repo is Linux-first and optimized for a personal Wayland workflow.
-
-It is opinionated, not a generic starter template.
-
-## License
-
-Personal dotfiles repository. Reuse freely with attribution.

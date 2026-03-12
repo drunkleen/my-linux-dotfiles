@@ -55,7 +55,15 @@ pkg() {
         return 1
       }
       printf '%s%s Package info:%s %s\n' "$_SHELL_UI_CYAN" "$_SHELL_ICON_PKG" "$_SHELL_UI_RESET" "$*"
-      apt -Qi "$@"
+      local pkg_name had_error=0
+      for pkg_name in "$@"; do
+        if dpkg-query -W -f='${Package}\n' "$pkg_name" >/dev/null 2>&1; then
+          dpkg -s "$pkg_name" || had_error=1
+        else
+          apt-cache show "$pkg_name" || had_error=1
+        fi
+      done
+      return "$had_error"
       ;;
     ''|help|-h|--help)
       printf '%s%s pkg%s  %ssystem package manager wrapper%s\n\n' "$_SHELL_UI_BOLD" "$_SHELL_ICON_PKG" "$_SHELL_UI_RESET" "$_SHELL_UI_DIM" "$_SHELL_UI_RESET"

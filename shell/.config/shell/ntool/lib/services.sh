@@ -8,6 +8,22 @@ ntool_systemd_enabled() {
     systemctl is-enabled --quiet "$1" >/dev/null 2>&1
 }
 
+ntool_ssh_unit() {
+    local unit load_state
+
+    if ntool_has systemctl; then
+        for unit in ssh sshd; do
+            load_state="$(systemctl show -p LoadState --value "$unit" 2>/dev/null || true)"
+            if [[ -n "$load_state" && "$load_state" != "not-found" ]]; then
+                printf '%s\n' "$unit"
+                return 0
+            fi
+        done
+    fi
+
+    printf 'ssh\n'
+}
+
 ntool_wireguard_state() {
     local profile="$1"
     if ! ntool_has wg; then
@@ -46,7 +62,9 @@ ntool_tailscaled_state() {
 }
 
 ntool_ssh_state() {
-    if ntool_systemd_active sshd; then
+    local unit
+    unit="$(ntool_ssh_unit)"
+    if ntool_has systemctl && ntool_systemd_active "$unit"; then
         printf 'active'
     else
         printf 'inactive'
@@ -111,17 +129,20 @@ ntool_vpn_action() {
 
 ntool_ssh_action() {
     local action="${1:-}"
+    local unit
+    unit="$(ntool_ssh_unit)"
     case "$action" in
-        on) sudo systemctl start sshd ;;
-        off) sudo systemctl stop sshd ;;
-        restart) sudo systemctl restart sshd ;;
+        on) sudo systemctl start "$unit" ;;
+        off) sudo systemctl stop "$unit" ;;
+        restart) sudo systemctl restart "$unit" ;;
         status)
             printf 'SSH run: %s\n' "$(ntool_ssh_state)"
-            printf 'SSH boot: %s\n' "$(if ntool_systemd_enabled sshd; then printf 'enabled'; else printf 'disabled'; fi)"
+            printf 'SSH unit: %s\n' "$unit"
+            printf 'SSH boot: %s\n' "$(if ntool_has systemctl && ntool_systemd_enabled "$unit"; then printf 'enabled'; else printf 'disabled'; fi)"
             printf 'SSH port: %s\n' "$(ntool_ssh_port)"
             ;;
-        enable) sudo systemctl enable sshd ;;
-        disable) sudo systemctl disable sshd ;;
+        enable) sudo systemctl enable "$unit" ;;
+        disable) sudo systemctl disable "$unit" ;;
         port) ntool_ssh_port ;;
         *)
             ntool_err 'usage: ntool ssh on|off|restart|status|enable|disable|port'

@@ -18,7 +18,7 @@ shellhelp() {
   printf '  %-14s %s\n' 'vim' 'Use Neovim'
   printf '  %-14s %s\n' 'cat' 'Use bat instead of cat'
   printf '  %-14s %s\n' 'open PATH' 'Open a file or URL with xdg-open'
-  printf '  %-14s %s\n\n' 'opendir [PATH]' 'Open a directory in Nautilus'
+  printf '  %-14s %s\n\n' 'opendir [PATH]' 'Open a directory in Nautilus or your default file manager'
 
   printf '%s%s Packages%s\n' "$_SHELL_UI_BLUE" "$_SHELL_ICON_PKG" "$_SHELL_UI_RESET"
   printf '  %sOrchestration%s\n' "$_SHELL_UI_DIM" "$_SHELL_UI_RESET"
@@ -34,15 +34,6 @@ shellhelp() {
   printf '    %-18s %s\n' 'pkg info PKG' 'Show installed package info'
   printf '    %-18s %s\n' 'pkg help' 'Show package command help'
   printf '\n'
-  printf '  %sAUR Packages%s\n' "$_SHELL_UI_DIM" "$_SHELL_UI_RESET"
-  printf '    %-18s %s\n' 'aur update' 'Update AUR packages with yay'
-  printf '    %-18s %s\n' 'aur install PKG' 'Install AUR package(s) with yay'
-  printf '    %-18s %s\n' 'aur remove PKG' 'Remove AUR package(s)'
-  printf '    %-18s %s\n' 'aur remove-deps' 'Remove AUR package(s) with deps'
-  printf '    %-18s %s\n' 'aur search QUERY' 'Search AUR packages'
-  printf '    %-18s %s\n' 'aur list' 'List installed AUR packages'
-  printf '    %-18s %s\n' 'aur info PKG' 'Show AUR package info'
-  printf '    %-18s %s\n\n' 'aur help' 'Show AUR command help'
 
   printf '%s%s Containers%s\n' "$_SHELL_UI_BLUE" "$_SHELL_ICON_DOCKER" "$_SHELL_UI_RESET"
   printf '  %sDocker Engine%s\n' "$_SHELL_UI_DIM" "$_SHELL_UI_RESET"

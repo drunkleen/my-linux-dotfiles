@@ -2,7 +2,9 @@
 #     tmux
 # fi
 
-leenfetch
+if command -v leenfetch >/dev/null 2>&1; then
+  leenfetch
+fi
 
 export PATH="$HOME/.local/bin:$PATH:$HOME/go/bin"
 
@@ -28,7 +30,6 @@ plugins=(
   zsh-256color
   zsh-autosuggestions
   zsh-syntax-highlighting
-  archlinux
   fzf-tab
   zsh-bat
 )
