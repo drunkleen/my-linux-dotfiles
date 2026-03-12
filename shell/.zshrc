@@ -33,7 +33,7 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
-[[ -f "$HOME/.alias" ]] && source "$HOME/.alias"
+[[ -f "$HOME/.config/shell/.alias" ]] && source "$HOME/.config/shell/.alias"
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
@@ -43,7 +43,7 @@ source <(fzf --zsh)
 
 export SSH_AUTH_SOCK="$HOME/.ssh/ssh-agent.sock"
 
-export PATH=$PATH:$HOME/go/bin
+export PATH="$HOME/.local/bin:$PATH:$HOME/go/bin"
 
 # export MOZ_ENABLE_WAYLAND=1
 

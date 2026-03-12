@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -eu
+
+script="${HOME}/.config/shell/ntool/ntool"
+
+if [ ! -x "${script}" ]; then
+    echo "ntool: missing executable ${script}" >&2
+    exit 1
+fi
+
+exec "${script}" "$@"
