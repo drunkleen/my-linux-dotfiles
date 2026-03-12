@@ -17,4 +17,13 @@ for _shell_file in "$HOME"/.config/shell/functions.d/*.zsh(N); do
   source "$_shell_file"
 done
 
+autoload -Uz _shell_shortcuts _ntool
+compdef _shell_shortcuts \
+  open opendir vc cat vim lz ls l ll ld lt mkdir update \
+  pkg aur \
+  docker dockerstart dockerstop dockerlist \
+  postgres mongo redis searx \
+  initmvn initgo send-notif iporigin ips shellhelp
+compdef _ntool ntool
+
 unset _shell_file

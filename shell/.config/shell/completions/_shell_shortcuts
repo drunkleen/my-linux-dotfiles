@@ -1,4 +1,4 @@
-#compdef open opendir vc cat vim lz ls l ll ld lt mkdir install remove remove_deps search list info aur_install aur_remove aur_remove_deps aur_search aur_list aur_info docker dockerstart dockerstop dockerlist pgstart pgstop mongostart mongostop searxstart searxstop redisstart redisstop initmvn initgo send-notif iporigin ips shellhelp
+#compdef open opendir vc cat vim lz ls l ll ld lt mkdir update pkg aur docker dockerstart dockerstop dockerlist postgres mongo redis searx initmvn initgo send-notif iporigin ips shellhelp
 
 local -a pacman_pkgs installed_pkgs aur_installed_pkgs iface_names
 
@@ -17,9 +17,47 @@ _shell_shortcuts_pkg_aur_installed() {
   (( ${#aur_installed_pkgs[@]} )) && _describe 'installed AUR packages' aur_installed_pkgs
 }
 
-_shell_shortcuts_iface_names() {
-  iface_names=(${(f)"$(ip -o link show 2>/dev/null | awk -F': ' '{print $2}')"})
-  (( ${#iface_names[@]} )) && _describe 'interfaces' iface_names
+_shell_shortcuts_pkg_subcommands() {
+  local -a subcmds
+  subcmds=(
+    'update:update repo packages'
+    'install:install package(s)'
+    'remove:remove package(s)'
+    'remove-deps:remove package(s) and dependencies'
+    'search:search pacman repositories'
+    'list:list installed packages'
+    'info:show package info'
+    'help:show pkg help'
+  )
+  _describe 'pkg commands' subcmds
+}
+
+_shell_shortcuts_aur_subcommands() {
+  local -a subcmds
+  subcmds=(
+    'update:update AUR packages'
+    'install:install AUR package(s)'
+    'remove:remove AUR package(s)'
+    'remove-deps:remove AUR package(s) and dependencies'
+    'search:search AUR packages'
+    'list:list installed AUR packages'
+    'info:show AUR package info'
+    'help:show aur help'
+  )
+  _describe 'aur commands' subcmds
+}
+
+_shell_shortcuts_container_subcommands() {
+  local -a subcmds
+  subcmds=(
+    'up:create/start the service'
+    'down:stop the service'
+    'status:show current service state'
+    'config:show current service config'
+    'recreate:recreate the service with new options'
+    'help:show command help'
+  )
+  _describe 'service commands' subcmds
 }
 
 case "$service" in
@@ -29,23 +67,88 @@ case "$service" in
   mkdir)
     _directories
     ;;
-  install|info)
-    _shell_shortcuts_pkg_available || _message 'package'
+  pkg)
+    if (( CURRENT == 2 )); then
+      _shell_shortcuts_pkg_subcommands
+    else
+      case "${words[2]:-}" in
+        install|info)
+          _shell_shortcuts_pkg_available || _message 'package'
+          ;;
+        remove|remove-deps)
+          _shell_shortcuts_pkg_installed || _message 'installed package'
+          ;;
+        search)
+          _message 'query'
+          ;;
+        update|list|help)
+          _nothing
+          ;;
+        *)
+          _default
+          ;;
+      esac
+    fi
     ;;
-  remove|remove_deps)
-    _shell_shortcuts_pkg_installed || _message 'installed package'
+  aur)
+    if (( CURRENT == 2 )); then
+      _shell_shortcuts_aur_subcommands
+    else
+      case "${words[2]:-}" in
+        install|info)
+          _message 'AUR package'
+          ;;
+        remove|remove-deps)
+          _shell_shortcuts_pkg_aur_installed || _message 'installed AUR package'
+          ;;
+        search)
+          _message 'query'
+          ;;
+        update|list|help)
+          _nothing
+          ;;
+        *)
+          _default
+          ;;
+      esac
+    fi
     ;;
-  search|aur_search)
-    _message 'query'
+  postgres|mongo|redis|searx)
+    if (( CURRENT == 2 )); then
+      _shell_shortcuts_container_subcommands
+    else
+      case "$service:${words[2]:-}" in
+        postgres:up|postgres:down|postgres:status|postgres:config|postgres:help|mongo:up|mongo:down|mongo:status|mongo:config|mongo:help|redis:up|redis:down|redis:status|redis:config|redis:help|searx:up|searx:down|searx:status|searx:config|searx:help)
+          _nothing
+          ;;
+        postgres:recreate)
+          _arguments \
+            '--user[PostgreSQL username]:user:' \
+            '--password[PostgreSQL password]:password:' \
+            '--db[PostgreSQL database name]:database:' \
+            '--port[PostgreSQL host port]:port:' \
+            '--image[PostgreSQL image]:image:' \
+            '--container-name[PostgreSQL container name]:name:' \
+            '--pgadmin-email[pgAdmin email]:email:' \
+            '--pgadmin-password[pgAdmin password]:password:' \
+            '--pgadmin-port[pgAdmin host port]:port:' \
+            '--pgadmin-image[pgAdmin image]:image:' \
+            '--pgadmin-name[pgAdmin container name]:name:'
+          ;;
+        mongo:recreate|redis:recreate|searx:recreate)
+          _arguments \
+            '--port[Service host port]:port:' \
+            '--image[Container image]:image:' \
+            '--name[Container name]:name:'
+          ;;
+        *)
+          _default
+          ;;
+      esac
+    fi
     ;;
-  list|update|aur_list|dockerstart|dockerstop|dockerlist|pgstart|pgstop|mongostart|mongostop|searxstart|searxstop|redisstart|redisstop|ips|shellhelp)
+  update|dockerstart|dockerstop|dockerlist|ips|shellhelp)
     _nothing
-    ;;
-  aur_install|aur_info)
-    _message 'AUR package'
-    ;;
-  aur_remove|aur_remove_deps)
-    _shell_shortcuts_pkg_aur_installed || _message 'installed AUR package'
     ;;
   initmvn|initgo)
     _message 'project name'
