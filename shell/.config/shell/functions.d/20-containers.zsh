@@ -29,7 +29,7 @@ postgres() {
   local pgadmin_email="${PGADMIN_DEFAULT_EMAIL:-admin@example.com}"
   local pgadmin_password="${PGADMIN_DEFAULT_PASSWORD:-admin}"
   local pgadmin_port="${PGADMIN_PORT:-8081}"
-  local current_pgadmin_email ip pgadmin_ip pg_state pgadmin_state
+  local current_pgadmin_email ip pgadmin_ip pg_state pgadmin_state ready_url ready_wait
 
   case "$subcmd" in
     recreate)
@@ -112,6 +112,19 @@ postgres() {
 
       ip="$(sudo docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$pg_container" 2>/dev/null)"
       pgadmin_ip="$(sudo docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$pgadmin_container" 2>/dev/null)"
+      ready_url="http://127.0.0.1:${pgadmin_port}/login"
+      ready_wait=0
+
+      if command -v curl >/dev/null 2>&1; then
+        until curl -fsSI --max-time 2 "$ready_url" >/dev/null 2>&1; do
+          ready_wait=$((ready_wait + 1))
+          if (( ready_wait >= 15 )); then
+            printf '%s%s pgAdmin not ready yet:%s %s\n' "$_SHELL_UI_YELLOW" "$_SHELL_ICON_INFO" "$_SHELL_UI_RESET" "$ready_url"
+            break
+          fi
+          sleep 1
+        done
+      fi
 
       printf '%s%s PostgreSQL:%s postgres://%s:%s@127.0.0.1:%s/%s\n' "$_SHELL_UI_GREEN" "$_SHELL_ICON_OK" "$_SHELL_UI_RESET" "$pg_user" "$pg_password" "$pg_port" "$pg_db"
       [[ -n "$ip" ]] && printf '  %scontainer ip%s  %s\n' "$_SHELL_UI_DIM" "$_SHELL_UI_RESET" "$ip"
