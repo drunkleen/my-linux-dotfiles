@@ -22,14 +22,14 @@ shellhelp() {
 
   printf '%s%s Packages%s\n' "$_SHELL_UI_BLUE" "$_SHELL_ICON_PKG" "$_SHELL_UI_RESET"
   printf '  %sOrchestration%s\n' "$_SHELL_UI_DIM" "$_SHELL_UI_RESET"
-  printf '    %-18s %s\n' 'update' 'Update repo packages and AUR packages'
+  printf '    %-18s %s\n' 'update' 'Update and Upgrade repo packages'
   printf '\n'
   printf '  %sRepo Packages%s\n' "$_SHELL_UI_DIM" "$_SHELL_UI_RESET"
-  printf '    %-18s %s\n' 'pkg update' 'Update repo packages with pacman'
-  printf '    %-18s %s\n' 'pkg install PKG' 'Install package(s) with pacman'
-  printf '    %-18s %s\n' 'pkg remove PKG' 'Remove package(s) with pacman'
+  printf '    %-18s %s\n' 'pkg update' 'Update and Upgrade repo packages with apt'
+  printf '    %-18s %s\n' 'pkg install PKG' 'Install package(s) with apt'
+  printf '    %-18s %s\n' 'pkg remove PKG' 'Remove package(s) with apt'
   printf '    %-18s %s\n' 'pkg remove-deps' 'Remove package(s) and dependencies'
-  printf '    %-18s %s\n' 'pkg search QUERY' 'Search pacman repositories'
+  printf '    %-18s %s\n' 'pkg search QUERY' 'Search apt repositories'
   printf '    %-18s %s\n' 'pkg list' 'List installed packages'
   printf '    %-18s %s\n' 'pkg info PKG' 'Show installed package info'
   printf '    %-18s %s\n' 'pkg help' 'Show package command help'

@@ -1,12 +1,6 @@
 update() {
-  printf '%s%s %sUpdating packages and AUR%s\n' "$_SHELL_UI_BLUE" "$_SHELL_ICON_PKG" "$_SHELL_UI_BOLD" "$_SHELL_UI_RESET"
+  # printf '%s%s %sUpdating packages%s\n' "$_SHELL_UI_BLUE" "$_SHELL_ICON_PKG" "$_SHELL_UI_BOLD" "$_SHELL_UI_RESET"
   pkg update "$@" || return 1
-
-  if command -v yay >/dev/null 2>&1; then
-    aur update "$@" || return 1
-  else
-    printf '%s%s Skipping AUR update:%s yay not installed\n' "$_SHELL_UI_YELLOW" "$_SHELL_ICON_INFO" "$_SHELL_UI_RESET"
-  fi
 }
 
 pkg() {
@@ -15,8 +9,9 @@ pkg() {
 
   case "$subcmd" in
     update)
-      printf '%s%s %sUpdating repo packages%s\n' "$_SHELL_UI_BLUE" "$_SHELL_ICON_PKG" "$_SHELL_UI_BOLD" "$_SHELL_UI_RESET"
+      printf '%s%s %sUpdating repo packages and Upgrading packages%s\n' "$_SHELL_UI_BLUE" "$_SHELL_ICON_PKG" "$_SHELL_UI_BOLD" "$_SHELL_UI_RESET"
       sudo apt update "$@"
+      sudo apt upgrade "$@"
       ;;
     install)
       (( $# )) || {

@@ -1,14 +1,14 @@
 #compdef open opendir vc cat vim lz ls l ll ld lt mkdir update pkg docker dockerstart dockerstop dockerlist postgres mongo redis searx initmvn initgo send-notif iporigin ips shellhelp
 
-local -a pacman_pkgs installed_pkgs iface_names
+local -a apt_pkgs installed_pkgs iface_names
 
 _shell_shortcuts_pkg_available() {
-  pacman_pkgs=(${(f)"$(pacman -Slq 2>/dev/null | sort -u)"})
-  (( ${#pacman_pkgs[@]} )) && _describe 'packages' pacman_pkgs
+  apt_pkgs=(${(f)"$(apt -Slq 2>/dev/null | sort -u)"})
+  (( ${#apt_pkgs[@]} )) && _describe 'packages' apt_pkgs
 }
 
 _shell_shortcuts_pkg_installed() {
-  installed_pkgs=(${(f)"$(pacman -Qq 2>/dev/null | sort -u)"})
+  installed_pkgs=(${(f)"$(apt -Qq 2>/dev/null | sort -u)"})
   (( ${#installed_pkgs[@]} )) && _describe 'installed packages' installed_pkgs
 }
 
@@ -16,11 +16,11 @@ _shell_shortcuts_pkg_installed() {
 _shell_shortcuts_pkg_subcommands() {
   local -a subcmds
   subcmds=(
-    'update:update repo packages'
+    'update:update and upgrade repo packages'
     'install:install package(s)'
     'remove:remove package(s)'
     'remove-deps:remove package(s) and dependencies'
-    'search:search pacman repositories'
+    'search:search apt repositories'
     'list:list installed packages'
     'info:show package info'
     'help:show pkg help'
