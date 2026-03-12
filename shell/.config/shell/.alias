@@ -1,6 +1,8 @@
 typeset -gU fpath
 fpath=("$HOME/.config/shell/completions" $fpath)
 
+[[ -f "$HOME/.config/shell/theme.zsh" ]] && source "$HOME/.config/shell/theme.zsh"
+
 autoload -Uz compinit
 if [[ -z "${_SHELL_COMPINIT_DONE:-}" ]]; then
   compinit

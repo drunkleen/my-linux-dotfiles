@@ -1,10 +1,22 @@
 iporigin() {
   local input target host ip info
 
-  (( $# )) || shell_fail "Usage: iporigin <ip|domain|url>" || return 1
-  shell_need curl || return 1
-  shell_need jq || return 1
-  shell_need getent || return 1
+  (( $# )) || {
+    printf '%s%s Usage:%s iporigin <ip|domain|url>\n' "$_SHELL_UI_RED" "$_SHELL_ICON_ERR" "$_SHELL_UI_RESET" >&2
+    return 1
+  }
+  command -v curl >/dev/null 2>&1 || {
+    printf '%s%s Missing command:%s curl\n' "$_SHELL_UI_RED" "$_SHELL_ICON_ERR" "$_SHELL_UI_RESET" >&2
+    return 1
+  }
+  command -v jq >/dev/null 2>&1 || {
+    printf '%s%s Missing command:%s jq\n' "$_SHELL_UI_RED" "$_SHELL_ICON_ERR" "$_SHELL_UI_RESET" >&2
+    return 1
+  }
+  command -v getent >/dev/null 2>&1 || {
+    printf '%s%s Missing command:%s getent\n' "$_SHELL_UI_RED" "$_SHELL_ICON_ERR" "$_SHELL_UI_RESET" >&2
+    return 1
+  }
 
   input="$1"
   target="$input"
@@ -27,34 +39,44 @@ iporigin() {
     ip="$host"
   else
     ip="$(getent ahosts "$host" | awk '{print $1}' | head -n 1)"
-    [[ -n "$ip" ]] || shell_fail "Could not resolve host: $host" || return 1
+    [[ -n "$ip" ]] || {
+      printf '%s%s Could not resolve host:%s %s\n' "$_SHELL_UI_RED" "$_SHELL_ICON_ERR" "$_SHELL_UI_RESET" "$host" >&2
+      return 1
+    }
   fi
 
   info="$(curl -fsS "http://ip-api.com/json/${ip}")"
-  echo "Input:   $input"
-  echo "Host:    $host"
-  echo "IP:      $ip"
-  echo "Country: $(echo "$info" | jq -r '.country')"
-  echo "Region:  $(echo "$info" | jq -r '.regionName')"
-  echo "City:    $(echo "$info" | jq -r '.city')"
-  echo "ISP:     $(echo "$info" | jq -r '.isp')"
-  echo "ASN:     $(echo "$info" | jq -r '.as')"
+  printf '%s%s IP origin lookup%s\n' "$_SHELL_UI_BLUE" "$_SHELL_ICON_NET" "$_SHELL_UI_RESET"
+  printf '  %sInput%s    %s\n' "$_SHELL_UI_DIM" "$_SHELL_UI_RESET" "$input"
+  printf '  %sHost%s     %s\n' "$_SHELL_UI_DIM" "$_SHELL_UI_RESET" "$host"
+  printf '  %sIP%s       %s\n' "$_SHELL_UI_DIM" "$_SHELL_UI_RESET" "$ip"
+  printf '  %sCountry%s  %s\n' "$_SHELL_UI_DIM" "$_SHELL_UI_RESET" "$(echo "$info" | jq -r '.country')"
+  printf '  %sRegion%s   %s\n' "$_SHELL_UI_DIM" "$_SHELL_UI_RESET" "$(echo "$info" | jq -r '.regionName')"
+  printf '  %sCity%s     %s\n' "$_SHELL_UI_DIM" "$_SHELL_UI_RESET" "$(echo "$info" | jq -r '.city')"
+  printf '  %sISP%s      %s\n' "$_SHELL_UI_DIM" "$_SHELL_UI_RESET" "$(echo "$info" | jq -r '.isp')"
+  printf '  %sASN%s      %s\n' "$_SHELL_UI_DIM" "$_SHELL_UI_RESET" "$(echo "$info" | jq -r '.as')"
 }
 
 ips() {
   local hide_re='^(br-|veth|virbr|podman|tun|tap)'
   local pub4 pub6
 
-  shell_need ip || return 1
-  shell_need curl || return 1
+  command -v ip >/dev/null 2>&1 || {
+    printf '%s%s Missing command:%s ip\n' "$_SHELL_UI_RED" "$_SHELL_ICON_ERR" "$_SHELL_UI_RESET" >&2
+    return 1
+  }
+  command -v curl >/dev/null 2>&1 || {
+    printf '%s%s Missing command:%s curl\n' "$_SHELL_UI_RED" "$_SHELL_ICON_ERR" "$_SHELL_UI_RESET" >&2
+    return 1
+  }
 
-  echo "Local IPv4"
+  printf '%s%s Local IPv4%s\n' "$_SHELL_UI_BLUE" "$_SHELL_ICON_NET" "$_SHELL_UI_RESET"
   ip -o -4 addr show up \
     | awk -v re="$hide_re" '$2 !~ re { print $2, $4 }' \
     | sort -k1,1
 
   echo
-  echo "Local IPv6"
+  printf '%s%s Local IPv6%s\n' "$_SHELL_UI_BLUE" "$_SHELL_ICON_NET" "$_SHELL_UI_RESET"
   ip -o -6 addr show up scope global 2>/dev/null \
     | awk -v re="$hide_re" '$2 !~ re { print $2, $4 }' \
     | sort -k1,1
@@ -63,6 +85,6 @@ ips() {
   pub6="$(curl -6fsS --max-time 3 https://ifconfig.co 2>/dev/null || true)"
 
   echo
-  echo "Public IPv4: ${pub4:-not available}"
-  echo "Public IPv6: ${pub6:-not available}"
+  printf '  %sPublic IPv4%s  %s\n' "$_SHELL_UI_DIM" "$_SHELL_UI_RESET" "${pub4:-not available}"
+  printf '  %sPublic IPv6%s  %s\n' "$_SHELL_UI_DIM" "$_SHELL_UI_RESET" "${pub6:-not available}"
 }
