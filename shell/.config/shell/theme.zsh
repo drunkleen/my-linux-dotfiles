@@ -29,3 +29,4 @@ typeset -gr _SHELL_ICON_DB='🛢'
 typeset -gr _SHELL_ICON_NET='🌐'
 typeset -gr _SHELL_ICON_NOTE='✉'
 typeset -gr _SHELL_ICON_BUILD='⚒'
+

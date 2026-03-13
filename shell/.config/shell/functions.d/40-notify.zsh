@@ -1,11 +1,16 @@
 send-notif() {
-  local ntfy_topic="u6Wn2kcJvg0Wvm58i9ct3JuzFdETESwFh6mtFswx7JWLGuyFVf1gbNaYsUjKXunA"
+  local ntfy_topic="${NTFY_TOPIC:-}"
   local ntfy_url="https://ntfy.sh/${ntfy_topic}"
-  local ntfy_title="pi5 - Galaxy"
+  local ntfy_title="Archlinux - Hogwarts"
   local raw message
 
   command -v curl >/dev/null 2>&1 || {
     printf '%s%s Missing command:%s curl\n' "$_SHELL_UI_RED" "$_SHELL_ICON_ERR" "$_SHELL_UI_RESET" >&2
+    return 1
+  }
+
+  [[ -n "$ntfy_topic" ]] || {
+    printf '%s%s Missing env var:%s NTFY_TOPIC\n' "$_SHELL_UI_RED" "$_SHELL_ICON_ERR" "$_SHELL_UI_RESET" >&2
     return 1
   }
 

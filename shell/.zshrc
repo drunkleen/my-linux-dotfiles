@@ -6,6 +6,7 @@ if command -v leenfetch >/dev/null 2>&1; then
   leenfetch
 fi
 
+[[ -f "$HOME/.env" ]] && source "$HOME/.env"
 export PATH="$HOME/.local/bin:$PATH:$HOME/go/bin"
 
 eval "$(mise activate zsh)"
