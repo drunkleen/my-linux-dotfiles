@@ -15,7 +15,7 @@ The current working tree contains these Stow packages:
 | [`hypr`](hypr) | `~/.config/hypr/` | Omarchy-specific Hyprland Lua configuration |
 | [`leenfetch`](leenfetch) | `~/.config/leenfetch/` | Custom Leenfetch layout and modules |
 | [`nvim`](nvim) | `~/.config/nvim/` | Neovim configuration from the `tired.nvim` Git submodule |
-| [`omarchy`](omarchy) | `~/.config/omarchy/`, `~/.config/systemd/user/`, `~/.local/` | Lock screen, desktop clock, font, and resume input fix |
+| [`omarchy`](omarchy) | `~/.config/omarchy/`, `~/.config/systemd/user/`, `~/.config/gtk-*`, `~/.icons/`, `~/.local/` | Lock screen, desktop clock, cursor, font, and resume input fix |
 | [`shell`](shell) | `~/.zshrc`, `~/.gitconfig`, `~/.config/shell/` | Zsh setup and shared shell utilities |
 | [`tmux`](tmux) | `~/.config/tmux/` | tmux keybindings, behavior, and theme |
 
@@ -28,6 +28,7 @@ The base installation requires:
 - [Omarchy](https://omarchy.org/)
 - Git
 - GNU Stow
+- `capitaine-cursors`
 
 The configuration also expects several tools used by the shell setup, including Zsh, Starship, zoxide, fzf, fd, eza, bat, ripgrep, tmux, and Leenfetch. Some helper functions additionally use Docker, `yay`, `jq`, and desktop utilities such as `xdg-open`.
 
@@ -82,6 +83,7 @@ Run it from an unlocked graphical Omarchy session. It:
 4. Enables and starts the fcitx5 resume monitor.
 5. Rescans the Omarchy plugin registry.
 6. Enables the custom lock screen and desktop clock.
+7. Sets `capitaine-cursors` as the Hyprland, GTK, and XCursor default at size 24.
 
 If the Omarchy or Hyprland target files already exist, back them up before running the helper:
 
@@ -129,6 +131,14 @@ The service uses systemd's `%h` home-directory specifier, so it works without ha
 The font is stored in [`omarchy/.local/share/fonts/stencil-pixel-7/`](omarchy/.local/share/fonts/stencil-pixel-7). Its original readme is included in the same directory. The font is free for home use; consult that file before commercial use.
 
 After installation, verify the customization by locking once and then performing one suspend/resume cycle. Confirm that the clock renders correctly, the password field is focused, and keyboard input works immediately.
+
+### Cursor theme
+
+The desktop uses the dark `capitaine-cursors` variant at size 24. The setting is applied through the Omarchy Hyprland environment, GTK 3/4 settings, GNOME interface settings, and the standard XCursor fallback. Install it with:
+
+```bash
+sudo pacman -S capitaine-cursors
+```
 
 ## Shell Configuration
 

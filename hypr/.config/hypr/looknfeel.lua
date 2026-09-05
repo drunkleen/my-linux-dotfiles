@@ -1,5 +1,9 @@
 -- Change the default Omarchy look'n'feel.
 
+-- Capitaine is the default cursor theme for Hyprland and launched apps.
+hl.env("XCURSOR_THEME", "capitaine-cursors")
+hl.env("XCURSOR_SIZE", "24")
+
 -- https://wiki.hypr.land/Configuring/Basics/Variables/#general
 -- hl.config({
 --   general = {

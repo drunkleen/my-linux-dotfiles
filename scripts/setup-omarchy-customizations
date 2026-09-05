@@ -4,6 +4,11 @@ set -euo pipefail
 
 repo_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 
+if ! pacman -Q capitaine-cursors >/dev/null 2>&1; then
+  printf '%s\n' 'Missing package: install it with sudo pacman -S capitaine-cursors' >&2
+  exit 1
+fi
+
 cd "$repo_dir"
 stow hypr omarchy
 
@@ -11,6 +16,13 @@ fc-cache -f "$HOME/.local/share/fonts"
 
 systemctl --user daemon-reload
 systemctl --user enable --now omarchy-fcitx5-resume.service
+
+gsettings set org.gnome.desktop.interface cursor-theme 'capitaine-cursors'
+gsettings set org.gnome.desktop.interface cursor-size 24
+
+if command -v hyprctl >/dev/null 2>&1; then
+  hyprctl setcursor capitaine-cursors 24
+fi
 
 if command -v omarchy-shell >/dev/null 2>&1; then
   omarchy-shell shell rescanPlugins
