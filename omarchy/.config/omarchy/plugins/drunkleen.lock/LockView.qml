@@ -10,6 +10,8 @@ Item {
   property string backgroundPath: ""
   property int backgroundVersion: 0
   property bool fingerprintConfigured: false
+  property bool fido2Present: false
+  property bool fido2Authenticating: false
   property bool authenticatingPassword: false
   property string failureMessage: ""
   property int failedAttempts: 0
@@ -18,7 +20,7 @@ Item {
   property string passwordText: ""
   property bool syncingPasswordText: false
 
-  readonly property string placeholderText: "Enter Password"
+  readonly property string placeholderText: fido2Authenticating ? "Touch FIDO2 key…" : (fido2Present ? "Authenticate with FIDO2 key" : "Enter Password")
   readonly property int fieldWidth: 381
   readonly property int fieldHeight: 67
   readonly property int outlineThickness: 3
@@ -75,6 +77,9 @@ Item {
   }
   onAuthenticatingPasswordChanged: {
     if (!authenticatingPassword && inputEnabled) Qt.callLater(forcePasswordFocus)
+  }
+  onFido2PresentChanged: {
+    if (!fido2Present && inputEnabled) Qt.callLater(forcePasswordFocus)
   }
   onVisibleChanged: {
     if (visible && inputEnabled) Qt.callLater(forcePasswordFocus)
@@ -197,8 +202,8 @@ Item {
         activeFocusOnPress: true
         focus: enabled
         clip: true
-        enabled: root.inputEnabled && !root.authenticatingPassword
-        readOnly: root.authenticatingPassword
+        enabled: root.inputEnabled && !root.authenticatingPassword && !root.fido2Present
+        readOnly: root.authenticatingPassword || root.fido2Present
         echoMode: TextInput.Password
         passwordCharacter: "*"
         passwordMaskDelay: 0

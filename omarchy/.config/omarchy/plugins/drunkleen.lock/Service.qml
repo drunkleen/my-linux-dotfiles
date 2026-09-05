@@ -19,8 +19,10 @@ Item {
   property bool lockRequested: false
   property bool pendingSessionLock: false
   property bool authenticatingPassword: false
+  property bool fido2Authenticating: false
   property bool fingerprintAuthenticating: false
   property bool passwordPamConfigured: false
+  property bool fido2Present: false
   property bool fingerprintConfigured: false
   property bool previewVisible: false
   property string enteredPassword: ""
@@ -35,7 +37,7 @@ Item {
   property bool strandedLockResolved: false
 
   readonly property bool locked: lockRequested || sessionLock.locked || sessionLock.secure
-  readonly property bool authenticating: authenticatingPassword || fingerprintAuthenticating
+  readonly property bool authenticating: authenticatingPassword || fido2Authenticating || fingerprintAuthenticating
 
   function realScreenCount() {
     var screens = Quickshell.screens || []
@@ -107,6 +109,10 @@ Item {
     if (!fingerprintCheckProc.running) fingerprintCheckProc.running = true
   }
 
+  function refreshFido2Status() {
+    if (!fido2CheckProc.running) fido2CheckProc.running = true
+  }
+
   function logEvent(event) {
     lastEvent = event
     lastEventAt = new Date().toISOString()
@@ -119,9 +125,12 @@ Item {
     failureMessage = ""
     failedAttempts = 0
     authenticatingPassword = false
+    fido2Authenticating = false
     fingerprintAuthenticating = false
     fingerprintRetryTimer.stop()
+    fido2RetryTimer.stop()
     if (passwordPam.active) passwordPam.abort()
+    if (fido2Pam.active) fido2Pam.abort()
     if (fingerprintPam.active) fingerprintPam.abort()
   }
 
@@ -140,6 +149,7 @@ Item {
     Qt.callLater(function() {
       root.refreshBackground()
       root.refreshFingerprintStatus()
+      root.refreshFido2Status()
     })
 
     return true
@@ -227,6 +237,25 @@ Item {
     }
   }
 
+  function startFido2() {
+    if (!lockRequested || !sessionLock.secure || !fido2Present) return
+    if (fido2Pam.active || fido2Authenticating) return
+
+    fido2Authenticating = true
+    if (!fido2Pam.start()) {
+      fido2Authenticating = false
+      fido2RetryTimer.restart()
+    }
+  }
+
+  function handleFido2Finished(result) {
+    fido2Authenticating = false
+
+    if (!lockRequested) return
+    if (result === PamResult.Success) finishUnlock()
+    else if (fido2Present) fido2RetryTimer.restart()
+  }
+
   WlSessionLock {
     id: sessionLock
 
@@ -238,7 +267,8 @@ Item {
         root.pendingSessionLock = false
         sessionLockStabilizeTimer.stop()
         pendingSessionLockTimer.stop()
-        Qt.callLater(lockView.forcePasswordFocus)
+        root.refreshFido2Status()
+        root.startFido2()
         root.startFingerprint()
       }
     }
@@ -250,7 +280,6 @@ Item {
         root.pendingSessionLock = false
         sessionLockStabilizeTimer.stop()
         pendingSessionLockTimer.stop()
-        Qt.callLater(lockView.forcePasswordFocus)
       }
 
       if (!locked && root.lockRequested) {
@@ -273,6 +302,8 @@ Item {
         backgroundPath: root.backgroundPath
         backgroundVersion: root.backgroundVersion
         fingerprintConfigured: root.fingerprintConfigured
+        fido2Present: root.fido2Present
+        fido2Authenticating: root.fido2Authenticating
         authenticatingPassword: root.authenticatingPassword
         failureMessage: root.failureMessage
         failedAttempts: root.failedAttempts
@@ -303,6 +334,8 @@ Item {
       backgroundPath: root.backgroundPath
       backgroundVersion: root.backgroundVersion
       fingerprintConfigured: root.fingerprintConfigured
+      fido2Present: root.fido2Present
+      fido2Authenticating: false
       authenticatingPassword: false
       failureMessage: ""
       failedAttempts: 0
@@ -355,11 +388,30 @@ Item {
     }
   }
 
+  PamContext {
+    id: fido2Pam
+    config: "omarchy-lock-fido2"
+    user: root.userName
+
+    onCompleted: function(result) { root.handleFido2Finished(result) }
+    onError: function(error) {
+      root.fido2Authenticating = false
+      if (root.lockRequested && root.fido2Present) fido2RetryTimer.restart()
+    }
+  }
+
   Timer {
     id: fingerprintRetryTimer
     interval: 250
     repeat: false
     onTriggered: root.startFingerprint()
+  }
+
+  Timer {
+    id: fido2RetryTimer
+    interval: 500
+    repeat: false
+    onTriggered: root.startFido2()
   }
 
   Process {
@@ -386,6 +438,29 @@ Item {
       if (root.lockRequested && root.fingerprintConfigured) root.startFingerprint()
       else if (!root.fingerprintConfigured && fingerprintPam.active) fingerprintPam.abort()
     }
+  }
+
+  Process {
+    id: fido2CheckProc
+    command: ["bash", "-c", "if [[ -f /etc/pam.d/omarchy-lock-fido2 && -r /etc/fido2/fido2 ]] && command -v fido2-token >/dev/null 2>&1 && [[ -n $(fido2-token -L 2>/dev/null) ]]; then echo yes; else echo no; fi"]
+    stdout: StdioCollector { id: fido2CheckStdout; waitForEnd: true }
+    onExited: {
+      var present = String(fido2CheckStdout.text || "").trim() === "yes"
+      root.fido2Present = present
+      if (root.lockRequested && root.sessionLock.secure && present) root.startFido2()
+      else if (!present) {
+        if (fido2Pam.active) fido2Pam.abort()
+        root.fido2Authenticating = false
+      }
+    }
+  }
+
+  Timer {
+    id: fido2PollTimer
+    interval: 1000
+    repeat: true
+    running: root.lockRequested
+    onTriggered: root.refreshFido2Status()
   }
 
   Process {
@@ -470,7 +545,6 @@ Item {
     target: Quickshell
     function onScreensChanged() {
       root.requestSessionLock()
-      if (root.lockRequested) Qt.callLater(lockView.forcePasswordFocus)
 
       // A monitor still coming up has no workspace, so cannot answer yet.
       strandedLockRetryTimer.rearm()
@@ -507,6 +581,7 @@ Item {
   Component.onCompleted: {
     refreshBackground()
     refreshFingerprintStatus()
+    refreshFido2Status()
     checkStrandedLock()
   }
 
@@ -533,6 +608,7 @@ Item {
         realScreens: root.realScreenCount(),
         passwordPam: root.passwordPamConfigured,
         fingerprint: root.fingerprintConfigured,
+        fido2: root.fido2Present,
         authenticating: root.authenticating,
         lastEvent: root.lastEvent,
         lastEventAt: root.lastEventAt

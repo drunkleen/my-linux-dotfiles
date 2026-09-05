@@ -112,6 +112,8 @@ The package also includes `hyprsunset`, XDG desktop portal, recording, and Lua l
 
 - a Stencil Pixel-7 clock and day/date display
 - a matching password field and password characters
+- automatic FIDO2 security-key detection and unlock through `omarchy-lock-fido2`
+- password fallback when no FIDO2 key is present
 - automatic password-field focus
 - password and fingerprint PAM flows
 - layout and focus hardening for suspend and lid-close behavior
