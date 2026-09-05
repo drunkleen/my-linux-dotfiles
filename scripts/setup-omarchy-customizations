@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+repo_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+
+cd "$repo_dir"
+stow hypr omarchy
+
+fc-cache -f "$HOME/.local/share/fonts"
+
+systemctl --user daemon-reload
+systemctl --user enable --now omarchy-fcitx5-resume.service
+
+if command -v omarchy-shell >/dev/null 2>&1; then
+  omarchy-shell shell rescanPlugins
+  omarchy-plugin-enable drunkleen.lock
+  omarchy-plugin-enable drunkleen.desktop-clock
+else
+  printf '%s\n' 'Omarchy shell commands were not found; enable drunkleen.lock and drunkleen.desktop-clock after installing Omarchy.'
+fi
+
+printf '%s\n' 'Omarchy lock screen, desktop clock, font, Hyprland config, and resume input fix installed.'

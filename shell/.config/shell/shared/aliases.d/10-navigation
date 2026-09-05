@@ -1,0 +1,23 @@
+alias c='clear'
+alias cls='clear'
+
+alias lz='ls'
+alias ls='eza -a --icons=auto'
+alias l='eza -lh --icons=auto'
+alias ll='eza -al --icons=auto'
+alias ld='eza -lhD --icons=auto'
+alias lt='eza -a --tree --level=1 --icons=auto'
+
+alias ..='cd ..'
+alias ...='cd ../..'
+alias .3='cd ../../..'
+alias .4='cd ../../../..'
+alias .5='cd ../../../../..'
+
+# zoxide integration: zsh provides `z`, add a cd alias too
+if command -v zoxide >/dev/null 2>&1; then
+  alias cd='z'
+fi
+
+
+alias mkdir='mkdir -p'

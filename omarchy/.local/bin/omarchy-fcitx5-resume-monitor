@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Restart Omarchy's managed input method after resume. Fcitx5 can retain a
+# stale Wayland input grab across s2idle, leaving the lock screen unable to
+# receive keyboard input.
+dbus-monitor --system \
+  "type='signal',sender='org.freedesktop.login1',interface='org.freedesktop.login1.Manager',member='PrepareForSleep'" |
+while IFS= read -r line; do
+  if [[ $line == *"boolean false"* ]]; then
+    sleep 1
+    systemctl --user restart omarchy-fcitx5.service
+  fi
+done

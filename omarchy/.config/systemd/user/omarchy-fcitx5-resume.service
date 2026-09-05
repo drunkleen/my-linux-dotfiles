@@ -1,0 +1,15 @@
+[Unit]
+Description=Restart Omarchy fcitx5 after resume
+After=dbus.socket graphical-session.target
+Requires=dbus.socket
+PartOf=graphical-session.target
+ConditionEnvironment=WAYLAND_DISPLAY
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/omarchy-fcitx5-resume-monitor
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=graphical-session.target
