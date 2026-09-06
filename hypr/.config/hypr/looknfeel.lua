@@ -2,7 +2,7 @@
 
 -- Capitaine is the default cursor theme for Hyprland and launched apps.
 hl.env("XCURSOR_THEME", "capitaine-cursors")
-hl.env("XCURSOR_SIZE", "24")
+hl.env("XCURSOR_SIZE", "30")
 
 -- https://wiki.hypr.land/Configuring/Basics/Variables/#general
 -- hl.config({
