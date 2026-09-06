@@ -10,3 +10,7 @@
 	path = omarchy/.config/omarchy/plugins/omarchy.pixlock
 	url = https://github.com/drunkleen/omarchy.pixlock.git
 	branch = main
+[submodule "omarchy/.config/omarchy/themes/leenium.omarchy"]
+	path = omarchy/.config/omarchy/themes/leenium.omarchy
+	url = https://github.com/drunkleen/leenium.omarchy.git
+	branch = master
