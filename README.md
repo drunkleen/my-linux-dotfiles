@@ -23,8 +23,8 @@ Each package mirrors its destination below `$HOME`. The repository's [`.stowrc`]
 
 The two Omarchy plugins are maintained as separate Git submodules:
 
-- [`drunkleen/omarchy.paperwidget`](https://github.com/drunkleen/omarchy.paperwidget) → `omarchy/.config/omarchy/plugins/drunkleen.desktop-clock`
-- [`drunkleen/omarchy.pixlock`](https://github.com/drunkleen/omarchy.pixlock) → `omarchy/.config/omarchy/plugins/drunkleen.lock`
+- [`drunkleen/omarchy.paperwidget`](https://github.com/drunkleen/omarchy.paperwidget) → `omarchy/.config/omarchy/plugins/omarchy.paperwidget`
+- [`drunkleen/omarchy.pixlock`](https://github.com/drunkleen/omarchy.pixlock) → `omarchy/.config/omarchy/plugins/omarchy.pixlock`
 
 ## Requirements
 
@@ -94,8 +94,8 @@ If the Omarchy or Hyprland target files already exist, back them up before runni
 
 ```bash
 mv ~/.config/hypr ~/.config/hypr.pre-dotfiles
-mv ~/.config/omarchy/plugins/drunkleen.lock ~/.config/omarchy/plugins/drunkleen.lock.pre-dotfiles 2>/dev/null || true
-mv ~/.config/omarchy/plugins/drunkleen.desktop-clock ~/.config/omarchy/plugins/drunkleen.desktop-clock.pre-dotfiles 2>/dev/null || true
+mv ~/.config/omarchy/plugins/omarchy.pixlock ~/.config/omarchy/plugins/omarchy.pixlock.pre-dotfiles 2>/dev/null || true
+mv ~/.config/omarchy/plugins/omarchy.paperwidget ~/.config/omarchy/plugins/omarchy.paperwidget.pre-dotfiles 2>/dev/null || true
 ./scripts/setup-omarchy-customizations
 ```
 
@@ -113,7 +113,7 @@ The package also includes `hyprsunset`, XDG desktop portal, recording, and Lua l
 
 ### Lock screen
 
-[`drunkleen.lock`](omarchy/.config/omarchy/plugins/drunkleen.lock) is a customized clone of Omarchy's lock plugin. It provides:
+[`omarchy.pixlock`](omarchy/.config/omarchy/plugins/omarchy.pixlock) is a customized clone of Omarchy's lock plugin. It provides:
 
 - a Stencil Pixel-7 clock and day/date display
 - a matching password field and password characters
@@ -127,7 +127,7 @@ Its source repository is [drunkleen/omarchy.pixlock](https://github.com/drunklee
 
 ### Desktop clock
 
-[`drunkleen.desktop-clock`](omarchy/.config/omarchy/plugins/drunkleen.desktop-clock) displays the matching Stencil Pixel-7 clock and day/date at the bottom-left of the desktop.
+[`omarchy.paperwidget`](omarchy/.config/omarchy/plugins/omarchy.paperwidget) displays the matching Stencil Pixel-7 clock and day/date at the bottom-left of the desktop.
 
 Its source repository is [drunkleen/omarchy.paperwidget](https://github.com/drunkleen/omarchy.paperwidget).
 

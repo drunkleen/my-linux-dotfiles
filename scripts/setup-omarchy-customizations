@@ -26,10 +26,10 @@ fi
 
 if command -v omarchy-shell >/dev/null 2>&1; then
   omarchy-shell shell rescanPlugins
-  omarchy-plugin-enable drunkleen.lock
-  omarchy-plugin-enable drunkleen.desktop-clock
+  omarchy-plugin-enable omarchy.pixlock
+  omarchy-plugin-enable omarchy.paperwidget
 else
-  printf '%s\n' 'Omarchy shell commands were not found; enable drunkleen.lock and drunkleen.desktop-clock after installing Omarchy.'
+  printf '%s\n' 'Omarchy shell commands were not found; enable omarchy.pixlock and omarchy.paperwidget after installing Omarchy.'
 fi
 
 printf '%s\n' 'Omarchy lock screen, desktop clock, font, Hyprland config, and resume input fix installed.'
