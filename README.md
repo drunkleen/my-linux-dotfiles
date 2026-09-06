@@ -21,6 +21,11 @@ The current working tree contains these Stow packages:
 
 Each package mirrors its destination below `$HOME`. The repository's [`.stowrc`](.stowrc) sets the Stow target to `~/` and enables restowing.
 
+The two Omarchy plugins are maintained as separate Git submodules:
+
+- [`drunkleen/omarchy.paperwidget`](https://github.com/drunkleen/omarchy.paperwidget) → `omarchy/.config/omarchy/plugins/drunkleen.desktop-clock`
+- [`drunkleen/omarchy.pixlock`](https://github.com/drunkleen/omarchy.pixlock) → `omarchy/.config/omarchy/plugins/drunkleen.lock`
+
 ## Requirements
 
 The base installation requires:
@@ -118,9 +123,13 @@ The package also includes `hyprsunset`, XDG desktop portal, recording, and Lua l
 - password and fingerprint PAM flows
 - layout and focus hardening for suspend and lid-close behavior
 
+Its source repository is [drunkleen/omarchy.pixlock](https://github.com/drunkleen/omarchy.pixlock).
+
 ### Desktop clock
 
 [`drunkleen.desktop-clock`](omarchy/.config/omarchy/plugins/drunkleen.desktop-clock) displays the matching Stencil Pixel-7 clock and day/date at the bottom-left of the desktop.
+
+Its source repository is [drunkleen/omarchy.paperwidget](https://github.com/drunkleen/omarchy.paperwidget).
 
 ### Resume input fix
 

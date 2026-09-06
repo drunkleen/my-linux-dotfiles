@@ -2,3 +2,11 @@
 	path = nvim/.config/nvim
 	url = https://github.com/drunkleen/tired.nvim.git
 	branch = master
+[submodule "omarchy/.config/omarchy/plugins/drunkleen.desktop-clock"]
+	path = omarchy/.config/omarchy/plugins/drunkleen.desktop-clock
+	url = https://github.com/drunkleen/omarchy.paperwidget.git
+	branch = main
+[submodule "omarchy/.config/omarchy/plugins/drunkleen.lock"]
+	path = omarchy/.config/omarchy/plugins/drunkleen.lock
+	url = https://github.com/drunkleen/omarchy.pixlock.git
+	branch = main
